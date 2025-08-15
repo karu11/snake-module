@@ -30,48 +30,91 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include "helpers/display.h"
 #include "theme.h"
 
+static uint8_t *buf_frame;
+
 static bool layer_switch_initialized = false;
 static struct layer_status_state ls_state;
 
-// static bool layer_switch_initialized = false;
-// static struct zmk_keycode_state_changed kc_state;
+static bool menu_on = false;
+static bool dongle_lock = false;
+
+static const uint8_t base_layer = 0;
+static const uint8_t menu_layer = 4;
+static const uint8_t theme_layer = 5;
 
 struct layer_status_state {
     uint8_t index;
     const char *label;
 };
 
-// struct zmk_keycode_state_changed {
-//     uint16_t usage_page;
-//     uint32_t keycode;
-//     uint8_t implicit_modifiers;
-//     uint8_t explicit_modifiers;
-//     bool state;
-//     int64_t timestamp;
-// };
+void print_frames() {
+    // board frame
+    print_rectangle(buf_frame, 0, 237, 0, 237, get_frame_color(), 2);
 
-    // uint32_t color1 = 0x302387u;
-    // uint32_t color2 = 0xff3796u;
-    // uint32_t color3 = 0x00faacu;
-    // uint32_t color4 = 0xfffdafu;
+    // status frames
+    print_rectangle(buf_frame, 2, 119, 2, 158, get_frame_color(), 2);
+    print_rectangle(buf_frame, 4, 117, 4, 156, get_frame_color_1(), 2);
 
-void set_layer_symbol() {
-    if (ls_state.index == 2) {
-        set_next_theme();
-        set_layer(ls_state.index, 1);
-    } else if (ls_state.index == 1) {
-        stop_snake();
-        clear_area();
-        start_battery_status();
-        start_output_status();
-        set_status_symbol();
-        set_battery_symbol();
-        print_themes();
-    } else {
+    // theme frames
+    print_rectangle(buf_frame, 121, 236, 2, 158, get_frame_color(), 2);
+    print_rectangle(buf_frame, 123, 234, 4, 156, get_frame_color_1(), 2);
+
+    // battery frames 
+    print_rectangle(buf_frame, 2, 119, 160, 236, get_frame_color(), 2);
+    print_rectangle(buf_frame, 4, 117, 162, 234, get_frame_color_1(), 2);
+
+    print_rectangle(buf_frame, 121, 236, 160, 236, get_frame_color(), 2);
+    print_rectangle(buf_frame, 123, 234, 162, 234, get_frame_color_1(), 2);
+}
+
+void print_menu() {
+    clear_area();
+    print_frames();
+    start_battery_status();
+    start_output_status();
+    set_status_symbol();
+    set_battery_symbol();
+    print_themes();
+}
+
+void toggle_menu() {
+    if (menu_on) {
         stop_output_status();
         stop_battery_status();
         restart_snake();
+        menu_on = false;
+    } else {
+        stop_snake();
+        print_menu();
+        menu_on = true;
     }
+}
+
+void change_theme() {
+    set_next_theme();
+    if (menu_on) {
+        print_menu();
+    } else {
+        stop_snake();
+        apply_theme_snake();
+        restart_snake();
+    }
+}
+
+void set_layer_symbol() {
+    if (dongle_lock) {
+        return;
+    }
+    dongle_lock = true;
+    if (ls_state.index == menu_layer) {
+        toggle_menu();
+        set_layer(ls_state.index, base_layer);
+    }
+    if (ls_state.index == theme_layer) {
+        change_theme();
+        set_layer(ls_state.index, base_layer);
+    }
+    dongle_lock = false;
 }
 
 void set_layer(uint8_t current_layer, uint8_t target_layer) {
@@ -103,8 +146,9 @@ ZMK_SUBSCRIPTION(widget_layer_status, zmk_layer_state_changed);
 
 void zmk_widget_layer_switch_init() {
 	widget_layer_status_init();
-}
 
+    buf_frame = (uint8_t*)k_malloc(320 * 2 * sizeof(uint8_t));
+}
 
 void start_layer_switch() {
     layer_switch_initialized = true;

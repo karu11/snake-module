@@ -667,6 +667,19 @@ void buffer_init() {
 	fill_buffer_color(buf, buf_size, get_snake_board_color());
 }
 
+void apply_theme_snake(void) {
+	fill_buffer_color(buf_color_0, buf_color_size, get_snake_color_0());
+	fill_buffer_color(buf_color_1, buf_color_size, get_snake_color_1());
+	fill_buffer_color(buf_color_2, buf_color_size, get_snake_color_2());
+	fill_buffer_color(buf_color_3, buf_color_size, get_snake_color_3());
+	fill_buffer_color(buf_color_4, buf_color_size, get_snake_color_4());
+	fill_buffer_color(buf_color_5, buf_color_size, get_snake_color_5());
+	fill_buffer_color(buf_color_6, buf_color_size, get_snake_color_6());
+	fill_buffer_color(buf_food_color, buf_color_size, get_food_color());
+	fill_buffer_color(buf_white, buf_white_size, get_snake_default_color());
+	fill_buffer_color(buf_board_1, buf_board_1_size, get_snake_board_1_color());
+	fill_buffer_color(buf, buf_size, get_snake_board_color());
+}
 
 void display_setup(void) {
 	white_buffer_init();
@@ -769,6 +782,5 @@ void stop_snake() {
 }
 
 void restart_snake() {
-    display_setup();
     stopped = false;
 }

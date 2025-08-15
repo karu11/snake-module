@@ -33,9 +33,9 @@ static const uint16_t scale = 6;
 static const uint16_t font_width = 5;
 static const uint16_t font_height = 8;
 
-static const uint16_t start_x_peripheral_1 = 20;
-static const uint16_t start_x_peripheral_2 = 130;
-static const uint16_t start_y = 170;
+static const uint16_t start_x_peripheral_1 = 16;
+static const uint16_t start_x_peripheral_2 = 134;
+static const uint16_t start_y = 176;
 
 struct peripheral_battery_state {
     uint8_t source;

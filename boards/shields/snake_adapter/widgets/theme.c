@@ -19,7 +19,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #define COLORS_PER_THEME 6
 
-static uint8_t themes_colors_len = 7;
+static uint8_t themes_colors_len = 8;
 static uint32_t themes_colors[][COLORS_PER_THEME] = {
     {0x222323u, 0xff4adcu, 0x3dff98u, 0xf0f6f0u, 0x000000u, 0xddddddu},
     {0x302387u, 0xff3796u, 0x00faacu, 0xfffdafu, 0x000000u, 0xddddddu},
@@ -28,6 +28,7 @@ static uint32_t themes_colors[][COLORS_PER_THEME] = {
     {0xfcdeeau, 0xff4d6du, 0x265935u, 0x012824u, 0x000000u, 0xddddddu},
     {0x282328u, 0x545c7eu, 0xc56981u, 0xa3a29au, 0x000000u, 0xddddddu},
     {0xfce4a8u, 0x71969fu, 0xd71a21u, 0x01334eu, 0x000000u, 0xddddddu},
+    {0x051f39u, 0xc53a9du, 0x4a2480u, 0xff8e80u, 0x000000u, 0xddddddu},
 };
 
 static uint8_t current_theme = 0;
@@ -37,8 +38,10 @@ static uint16_t theme_font_width = 5;
 static uint16_t theme_font_height = 7;
 static uint16_t *scaled_bitmap_theme_font;
 
+static uint8_t *buf_frame;
+
 static uint16_t theme_x = 140;
-static uint16_t theme_y = 20;
+static uint16_t theme_y = 18;
 
 static Character int_to_num_char(uint8_t i) {
     switch (i) {
@@ -69,16 +72,15 @@ void print_themes() {
 
     uint16_t line_gap_pixels = 2;
     uint16_t char_gap_pixels = 1;
-    uint8_t theme_template_len = 7;
     uint16_t theme_font_height_scaled = theme_font_height * theme_font_scale;
 
     for (uint8_t i = 0; i < themes_colors_len; i++) {
         uint16_t actual_y = theme_y + ((line_gap_pixels + theme_font_height_scaled) * i);
         theme_template[6] = int_to_num_char(i);
         if (i == current_theme) {
-            print_string(scaled_bitmap_theme_font, theme_template, theme_x, actual_y, theme_font_scale, get_symbol_unselected_color(), get_symbol_bg_color(), FONT_SIZE_5x7, char_gap_pixels, theme_template_len);
+            print_string(scaled_bitmap_theme_font, theme_template, theme_x, actual_y, theme_font_scale, get_symbol_unselected_color(), get_symbol_bg_color(), FONT_SIZE_5x7, char_gap_pixels, 7);
         } else {
-            print_string(scaled_bitmap_theme_font, theme_template, theme_x, actual_y, theme_font_scale, get_symbol_selected_color(), get_symbol_bg_color(), FONT_SIZE_5x7, char_gap_pixels, theme_template_len);
+            print_string(scaled_bitmap_theme_font, theme_template, theme_x, actual_y, theme_font_scale, get_symbol_selected_color(), get_symbol_bg_color(), FONT_SIZE_5x7, char_gap_pixels, 7);
         }
     }
 }
