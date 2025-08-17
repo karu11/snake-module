@@ -101,6 +101,13 @@ void change_theme() {
     }
 }
 
+void set_layer(uint8_t current_layer, uint8_t target_layer) {
+    zmk_keymap_layer_deactivate(current_layer);
+    zmk_keymap_layer_activate(target_layer);
+    // maybe use this? 
+    // int zmk_keymap_layer_to(zmk_keymap_layer_id_t layer);
+}
+
 void set_layer_symbol() {
     if (dongle_lock) {
         return;
@@ -115,13 +122,6 @@ void set_layer_symbol() {
         set_layer(ls_state.index, base_layer);
     }
     dongle_lock = false;
-}
-
-void set_layer(uint8_t current_layer, uint8_t target_layer) {
-    zmk_keymap_layer_deactivate(current_layer);
-    zmk_keymap_layer_activate(target_layer);
-    // maybe use this? 
-    // int zmk_keymap_layer_to(zmk_keymap_layer_id_t layer);
 }
 
 static void layer_status_update_cb(struct layer_status_state state) {

@@ -38,8 +38,6 @@ static uint16_t theme_font_width = 5;
 static uint16_t theme_font_height = 7;
 static uint16_t *scaled_bitmap_theme_font;
 
-static uint8_t *buf_frame;
-
 static uint16_t theme_x = 140;
 static uint16_t theme_y = 18;
 
@@ -85,6 +83,13 @@ void print_themes() {
     }
 }
 
+void set_next_theme_number() {
+    current_theme++;
+    if (current_theme >= themes_colors_len) {
+        current_theme = 0;
+    }
+}
+
 void set_next_theme() {
     set_next_theme_number();
     set_colors(
@@ -95,23 +100,6 @@ void set_next_theme() {
         themes_colors[current_theme][4],
         themes_colors[current_theme][5]
     );
-
-
-
-    // if (current_theme == 2) {
-    //     set_colors(0x222323u, 0xff4adcu, 0x3dff98u, 0xf0f6f0u, 0x000000u, 0xddddddu);
-    //     current_theme = 1;
-    // } else if (current_theme == 1) {
-    //     set_colors(0x302387u, 0xff3796u, 0x00faacu, 0xfffdafu, 0x000000u, 0xddddddu);
-    //     current_theme = 2;
-    // }
-}
-
-void set_next_theme_number() {
-    current_theme++;
-    if (current_theme >= themes_colors_len) {
-        current_theme = 0;
-    }
 }
 
 void theme_init() {

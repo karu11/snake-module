@@ -40,14 +40,6 @@ static uint16_t bt_bg_color;
 static uint16_t frame_color;
 static uint16_t frame_color_1;
 
-static uint32_t theme_color1;
-static uint32_t theme_color2;
-static uint32_t theme_color3;
-static uint32_t theme_color4;
-
-static uint32_t theme_black;
-static uint32_t theme_black_1;
-
 static const uint16_t empty_bitmap_5x7[] = {
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
@@ -1067,10 +1059,10 @@ void set_colors(uint32_t color1, uint32_t color2, uint32_t color3, uint32_t colo
     // uint32_t color4 = 0xa3a29au;
 
     // https://lospec.com/palette-list/b4sement best one so far
-    // uint32_t theme_color1 = 0x222323u;
-    // uint32_t theme_color2 = 0xff4adcu;
-    // uint32_t theme_color3 = 0x3dff98u;
-    // uint32_t theme_color4 = 0xf0f6f0u;
+    // uint32_t color1 = 0x222323u;
+    // uint32_t color2 = 0xff4adcu;
+    // uint32_t color3 = 0x3dff98u;
+    // uint32_t color4 = 0xf0f6f0u;
 
     // https://lospec.com/palette-list/americana
     // uint32_t color1 = 0xfce4a8u;
@@ -1080,8 +1072,8 @@ void set_colors(uint32_t color1, uint32_t color2, uint32_t color3, uint32_t colo
 
     // ######################## colors #################
     
-    // uint32_t theme_black = 0x000000u;
-    // uint32_t theme_black_1 = 0xddddddu;
+    // uint32_t black = 0x000000u;
+    // uint32_t black_1 = 0xddddddu;
 
     set_splash_num_color(color2);
     set_splash_bg_color(color1);
@@ -1120,7 +1112,6 @@ void set_colors(uint32_t color1, uint32_t color2, uint32_t color3, uint32_t colo
 
 void print_string(uint16_t *scaled_bitmap, Character str[], uint16_t x, uint16_t y, uint16_t scale, uint16_t color, uint16_t bg_color, FontSize font_size, uint16_t gap_pixels, uint8_t strLen) {
     uint16_t string_font_width_scaled = 0;
-    Character c = CHAR_NONE;
     if (font_size == FONT_SIZE_4x6) {
         string_font_width_scaled = 4 * scale;
     }

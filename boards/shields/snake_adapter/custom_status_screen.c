@@ -20,14 +20,6 @@ static const uint8_t SPLASH_FINAL_COUNT = 10;
 static uint8_t splash_count = 0;
 static bool splash_finished = false;
 
-// static uint32_t theme_color1 = 0x222323u;
-// static uint32_t theme_color2 = 0xff4adcu;
-// static uint32_t theme_color3 = 0x3dff98u;
-// static uint32_t theme_color4 = 0xf0f6f0u;
-
-// static uint32_t theme_black = 0x000000u;
-// static uint32_t theme_black_1 = 0xddddddu;
-
 void timer_splash(lv_timer_t * timer) {
     if (splash_finished) {
         return;

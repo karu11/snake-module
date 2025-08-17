@@ -545,25 +545,30 @@ static void paint_snake() {
 //     print_number_snake(snake_len, 132, 5, DECIMAL_PLACES_2);
 // }
 
+static uint8_t random_start_x(void) {
+    return random_number(SNAKE_BOARD_WIDTH);
+}
+
 static void initialize_snake(void) {
+    uint8_t random_x = random_start_x();
     clear_board();
     destroy_snake();
     current_number = inside_board_number + 1;
-    snake_board[4][4] = next_number();
-    snake_board[4][5] = next_number();
-    snake_board[4][6] = next_number();
-    snake_render_pixel(4, 6, true);
-    snake_render_pixel(4, 5, true);
-    snake_render_pixel(4, 4, true);
-    prepend_snake_part(4, 6);
-    prepend_snake_part(4, 5);
-    prepend_snake_part(4, 4);
+    snake_board[random_x][random_x] = next_number();
+    snake_board[random_x][random_x + 1] = next_number();
+    snake_board[random_x][random_x + 2] = next_number();
+    snake_render_pixel(random_x, random_x + 2, true);
+    snake_render_pixel(random_x, random_x + 1, true);
+    snake_render_pixel(random_x, random_x, true);
+    prepend_snake_part(random_x, random_x + 2);
+    prepend_snake_part(random_x, random_x + 1);
+    prepend_snake_part(random_x, random_x);
     snake_len = 0;
     //set_snake_length();
-    head_coordinate.x = 4;
-    head_coordinate.y = 6;
-    tail_coordinate.x = 4;
-    tail_coordinate.y = 4;
+    head_coordinate.x = random_x;
+    head_coordinate.y = random_x + 2;
+    tail_coordinate.x = random_x;
+    tail_coordinate.y = random_x;
     draw_index = 0;
     walk_index = 0;
     walk_timer = 0;
@@ -571,6 +576,33 @@ static void initialize_snake(void) {
     snake_died = false;
     snake_initialized = true;
 }
+
+// static void initialize_snake(void) {
+//     clear_board();
+//     destroy_snake();
+//     current_number = inside_board_number + 1;
+//     snake_board[4][4] = next_number();
+//     snake_board[4][5] = next_number();
+//     snake_board[4][6] = next_number();
+//     snake_render_pixel(4, 6, true);
+//     snake_render_pixel(4, 5, true);
+//     snake_render_pixel(4, 4, true);
+//     prepend_snake_part(4, 6);
+//     prepend_snake_part(4, 5);
+//     prepend_snake_part(4, 4);
+//     snake_len = 0;
+//     //set_snake_length();
+//     head_coordinate.x = 4;
+//     head_coordinate.y = 6;
+//     tail_coordinate.x = 4;
+//     tail_coordinate.y = 4;
+//     draw_index = 0;
+//     walk_index = 0;
+//     walk_timer = 0;
+//     tail_shrink_timeout = 0;
+//     snake_died = false;
+//     snake_initialized = true;
+// }
 
 static void finalize_snake(void) {
     snake_initialized = false;
@@ -707,7 +739,7 @@ Speed get_speed(uint8_t wpm) {
 }
 
 void set_speed() {
-    print_number_snake(snake_state.wpm, 204, 5, DECIMAL_PLACES_3);
+    //print_number_snake(snake_state.wpm, 204, 5, DECIMAL_PLACES_3);
     current_speed = get_speed(snake_state.wpm);
     switch(current_speed) {
         case SPEED_SUPER_SLOW: current_cycle_speed = TIMER_CYCLES_SUPER_SLOW; break;
@@ -727,7 +759,7 @@ struct snake_wpm_status_state snake_wpm_status_get_state(const zmk_event_t *eh) 
 void snake_wpm_status_update_cb(struct snake_wpm_status_state state) {
     snake_state = state;
     if (snake_widget_initialized) {
-        //set_speed();
+        set_speed();
     }
 }
 
