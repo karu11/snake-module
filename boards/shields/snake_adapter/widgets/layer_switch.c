@@ -29,6 +29,8 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include "battery_status.h"
 #include "helpers/display.h"
 #include "theme.h"
+//#include "snake_image.h"
+#include "logo.h"
 
 static uint8_t *buf_frame;
 
@@ -48,16 +50,20 @@ struct layer_status_state {
 };
 
 void print_frames() {
+    // logo frame
+    print_rectangle(buf_frame, 0, 238, 0, 108, get_frame_color(), 2);
+    print_rectangle(buf_frame, 2, 236, 2, 106, get_frame_color_1(), 2);
+
     // board frame
-    print_rectangle(buf_frame, 0, 237, 0, 237, get_frame_color(), 2);
+    print_rectangle(buf_frame, 0, 237, 110, 237, get_frame_color(), 2);
 
     // status frames
-    print_rectangle(buf_frame, 2, 119, 2, 158, get_frame_color(), 2);
-    print_rectangle(buf_frame, 4, 117, 4, 156, get_frame_color_1(), 2);
+    print_rectangle(buf_frame, 2, 119, 112, 158, get_frame_color(), 2);
+    print_rectangle(buf_frame, 4, 117, 114, 156, get_frame_color_1(), 2);
 
     // theme frames
-    print_rectangle(buf_frame, 121, 236, 2, 158, get_frame_color(), 2);
-    print_rectangle(buf_frame, 123, 234, 4, 156, get_frame_color_1(), 2);
+    print_rectangle(buf_frame, 121, 236, 112, 158, get_frame_color(), 2);
+    print_rectangle(buf_frame, 123, 234, 114, 156, get_frame_color_1(), 2);
 
     // battery frames 
     print_rectangle(buf_frame, 2, 119, 160, 236, get_frame_color(), 2);
@@ -68,7 +74,8 @@ void print_frames() {
 }
 
 void print_menu() {
-    clear_area();
+    clear_screen();
+    start_animation();
     print_frames();
     start_battery_status();
     start_output_status();
@@ -81,6 +88,7 @@ void toggle_menu() {
     if (menu_on) {
         stop_output_status();
         stop_battery_status();
+        stop_animation();
         restart_snake();
         menu_on = false;
     } else {
@@ -94,6 +102,7 @@ void change_theme() {
     set_next_theme();
     if (menu_on) {
         print_menu();
+        apply_theme_snake();
     } else {
         stop_snake();
         apply_theme_snake();
@@ -148,6 +157,8 @@ void zmk_widget_layer_switch_init() {
 	widget_layer_status_init();
 
     buf_frame = (uint8_t*)k_malloc(320 * 2 * sizeof(uint8_t));
+
+    //snake_image_buf = k_malloc(snake_image_width * 2 * sizeof(uint16_t));
 }
 
 void start_layer_switch() {
