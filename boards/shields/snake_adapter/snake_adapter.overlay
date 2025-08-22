@@ -1,17 +1,43 @@
 #include <dt-bindings/zmk/matrix_transform.h>
+#include <dt-bindings/zmk/keys.h>
 
 / {
     chosen {
-        zmk,kscan = &kscan1;
+        //zmk,kscan = &kscan1;
         zephyr,display = &st7789v;
     };
 
-	kscan1: kscan {
+	// kscan1: kscan {
+    //     compatible = "zmk,kscan-gpio-direct";
+    //     //wakeup-source;
+    //     input-gpios
+    //         = <&gpio0 31 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+    //         ;
+    // };
+
+    behaviors {
+        dongle_action_behavior: dongle_action_behavior {
+            compatible = "zmk,behavior-dongle-action";
+            #binding-cells = <0>;
+        };
+    };
+
+    dongle_action_direct_kscan: dongle_action_direct_kscan {
         compatible = "zmk,kscan-gpio-direct";
-        wakeup-source;
-        input-gpios
-            = <&gpio0 31 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
-            ;
+	    input-gpios
+	        = <&gpio0 31 (GPIO_ACTIVE_LOW | GPIO_PULL_UP)>
+	        ;
+    };
+
+    dongle_action_sideband_behaviors {
+        compatible = "zmk,kscan-sideband-behaviors";
+        kscan = <&dongle_action_direct_kscan>;
+		auto-enable;
+        dongle_action_sideband: dongle_action_sideband {
+            row = <0>;
+            column = <0>;
+            bindings = <&dongle_action_behavior>;
+        };
     };
 };
 
