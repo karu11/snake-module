@@ -12,11 +12,12 @@
 #include "widgets/helpers/display.h"
 #include "widgets/layer_switch.h"
 #include "widgets/logo.h"
+#include "widgets/configuration.h"
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
-static const uint8_t LOGO_ANIMATION_DURATION = 40;
+//static const uint8_t LOGO_ANIMATION_DURATION = 40;logo_animation_timer
 
 static const uint8_t SPLASH_DURATION = 50;
 static const uint8_t SPLASH_FINAL_COUNT = 50;
@@ -41,13 +42,10 @@ void timer_splash(lv_timer_t * timer) {
 }
 
 lv_obj_t* zmk_display_status_screen() {
+    configure();
     init_display();
     theme_init();
     logo_animation_init();
-
-    // default color scheme 
-    // https://lospec.com/palette-list/b4sement best one so far
-    // set_colors(0x222323u, 0xff4adcu, 0x3dff98u, 0xf0f6f0u, 0x000000u, 0xddddddu);
     
     zmk_widget_splash_init();
     zmk_widget_snake_init();
@@ -56,7 +54,7 @@ lv_obj_t* zmk_display_status_screen() {
     zmk_widget_layer_switch_init();
 
     lv_timer_create(timer_splash, SPLASH_DURATION, NULL);
-    lv_timer_create(logo_animation_timer, LOGO_ANIMATION_DURATION, NULL);
+    lv_timer_create(logo_animation_timer, CONFIG_LOGO_WALK_INTERVAL, NULL);
 
     return lv_obj_create(NULL);
 }

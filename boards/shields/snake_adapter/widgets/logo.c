@@ -12,13 +12,13 @@ static uint8_t logo_animation_height = 6;
 static uint8_t logo_animation_scale = 2;
 
 static uint16_t logo_animation_x = 24;
-static uint16_t logo_animation_y = 12;
+static uint16_t logo_animation_y = 15;
 
 static uint16_t animation_sections_total;
 static uint16_t animation_cycle_count = 0;
 
 static uint16_t snake_logo_x = 44;
-static uint16_t snake_logo_y = 34;
+static uint16_t snake_logo_y = 38;
 static uint16_t snake_logo_font_width = 3;
 static uint16_t snake_logo_font_height = 5;
 static uint16_t snake_logo_font_scale = 8;

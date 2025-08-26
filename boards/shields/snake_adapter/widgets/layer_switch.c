@@ -53,28 +53,26 @@ struct layer_status_state {
     const char *label;
 };
 
-void print_frames() {
-    // logo frame
-    print_rectangle(buf_frame, 0, 238, 0, 108, get_frame_color(), 2);
-    print_rectangle(buf_frame, 2, 236, 2, 106, get_frame_color_1(), 2);
+void print_container(uint8_t *buf_frame, uint16_t start_x, uint16_t end_x, uint16_t start_y, uint16_t end_y, uint16_t scale) {
+    print_rectangle(buf_frame, start_x, end_x - scale, start_y, end_y - scale, get_frame_color(), scale);
+    print_rectangle(buf_frame, start_x + scale, end_x - (scale * 2), start_y + scale, end_y - (scale * 2), get_frame_color_1(), scale);
+}
 
-    // board frame
-    print_rectangle(buf_frame, 0, 237, 110, 237, get_frame_color(), 2);
+void print_frames() {
+    uint16_t thickness = 1;
+    // logo frame
+    print_container(buf_frame, 0, 240, 0, 112, thickness);
 
     // status frames
-    print_rectangle(buf_frame, 2, 119, 112, 158, get_frame_color(), 2);
-    print_rectangle(buf_frame, 4, 117, 114, 156, get_frame_color_1(), 2);
+    print_container(buf_frame, 0, 120, 112, 160, thickness);
 
     // theme frames
-    print_rectangle(buf_frame, 121, 236, 112, 158, get_frame_color(), 2);
-    print_rectangle(buf_frame, 123, 234, 114, 156, get_frame_color_1(), 2);
+    print_container(buf_frame, 120, 240, 112, 160, thickness);
+
 
     // battery frames 
-    print_rectangle(buf_frame, 2, 119, 160, 236, get_frame_color(), 2);
-    print_rectangle(buf_frame, 4, 117, 162, 234, get_frame_color_1(), 2);
-
-    print_rectangle(buf_frame, 121, 236, 160, 236, get_frame_color(), 2);
-    print_rectangle(buf_frame, 123, 234, 162, 234, get_frame_color_1(), 2);
+    print_container(buf_frame, 0, 120, 160, 240, thickness);
+    print_container(buf_frame, 120, 240, 160, 240, thickness);
 }
 
 void print_menu() {
@@ -114,12 +112,12 @@ void change_theme() {
     }
 }
 
-void set_layer(uint8_t current_layer, uint8_t target_layer) {
-    zmk_keymap_layer_deactivate(current_layer);
-    zmk_keymap_layer_activate(target_layer);
-    // maybe use this? 
-    // int zmk_keymap_layer_to(zmk_keymap_layer_id_t layer);
-}
+// void set_layer(uint8_t current_layer, uint8_t target_layer) {
+//     zmk_keymap_layer_deactivate(current_layer);
+//     zmk_keymap_layer_activate(target_layer);
+//     // maybe use this? 
+//     // int zmk_keymap_layer_to(zmk_keymap_layer_id_t layer);
+// }
 
 void set_layer_symbol() {
     if (dongle_lock) {
@@ -128,34 +126,14 @@ void set_layer_symbol() {
     dongle_lock = true;
     if (ls_state.index == menu_layer) {
         toggle_menu();
-        set_layer(ls_state.index, base_layer);
+        //set_layer(ls_state.index, base_layer);
     }
     if (ls_state.index == theme_layer) {
         change_theme();
-        set_layer(ls_state.index, base_layer);
+        //set_layer(ls_state.index, base_layer);
     }
     dongle_lock = false;
 }
-
-// static void layer_status_update_cb(struct layer_status_state state) {
-//     ls_state = state;
-//     if (layer_switch_initialized) {
-//         set_layer_symbol();
-//     }
-// }
-
-// static struct layer_status_state layer_status_get_state(const zmk_event_t *eh) {
-//     uint8_t index = zmk_keymap_highest_layer_active();
-//     return (struct layer_status_state) {
-//         .index = index,
-//         .label = zmk_keymap_layer_name(index)
-//     };
-// }
-
-// ZMK_DISPLAY_WIDGET_LISTENER(widget_layer_status, struct layer_status_state, layer_status_update_cb,
-//                             layer_status_get_state)
-
-// ZMK_SUBSCRIPTION(widget_layer_status, zmk_layer_state_changed);
 
 void dongle_action_update_cb(struct zmk_dongle_actioned state) {
     if (state.timestamp == 0) {

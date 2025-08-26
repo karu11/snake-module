@@ -45,6 +45,25 @@ static uint16_t bt_bg_color;
 static uint16_t frame_color;
 static uint16_t frame_color_1;
 
+#define COLORS_PER_THEME 6
+
+static uint8_t themes_colors_len = 12;
+static uint32_t themes_colors[][COLORS_PER_THEME] = {
+    // primary   back       secondary
+    {0x222323u, 0xff4adcu, 0x3dff98u, 0xf0f6f0u, 0xf0f6f0u, 0xddddddu}, // C  - custom https://lospec.com/palette-list/b4sement
+    {0xd0d058u, 0x405010u, 0x708028u, 0xa0a840u, 0xf0f6f0u, 0xddddddu}, // 01 - https://lospec.com/palette-list/nostalgia
+    {0x222323u, 0xff4adcu, 0x3dff98u, 0xf0f6f0u, 0xf0f6f0u, 0xddddddu}, // 02 - https://lospec.com/palette-list/b4sement
+    {0xff3796u, 0x302387u, 0x00faacu, 0xfffdafu, 0xf0f6f0u, 0xddddddu}, // 03 - https://lospec.com/palette-list/fuzzyfour
+    {0x46878fu, 0x332c50u, 0x94e344u, 0xe2f3e4u, 0xf0f6f0u, 0xddddddu}, // 04 - https://lospec.com/palette-list/kirokaze-gameboy
+    {0x203671u, 0x0f052du, 0x36868fu, 0x5fc75du, 0xf0f6f0u, 0xddddddu}, // 05 - https://lospec.com/palette-list/moonlight-gb
+    {0xff4d6du, 0xfcdeeau, 0x265935u, 0x012824u, 0xf0f6f0u, 0xddddddu}, // 06 - https://lospec.com/palette-list/cherrymelon
+    {0x545c7eu, 0x282328u, 0xc56981u, 0xa3a29au, 0xf0f6f0u, 0xddddddu}, // 07 - https://lospec.com/palette-list/bittersweet
+    {0x71969fu, 0xfce4a8u, 0xd71a21u, 0x01334eu, 0xf0f6f0u, 0xddddddu}, // 08 - https://lospec.com/palette-list/americana
+    {0xc53a9du, 0x051f39u, 0x4a2480u, 0xff8e80u, 0xf0f6f0u, 0xddddddu}, // 09 - https://lospec.com/palette-list/lava-gb
+    {0xfb6634u, 0x2b2132u, 0x7e0d0du, 0xfeb746u, 0xf0f6f0u, 0xddddddu}, // 10 - https://lospec.com/gallery/2bitdream/of-the-earth
+    {0xecfffbu, 0x323859u, 0x576373u, 0x0c0421u, 0xf0f6f0u, 0xddddddu}, // 11 - https://lospec.com/gallery/dogmaster/cave
+};
+
 static const uint16_t empty_bitmap_5x7[] = {
     0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
@@ -747,6 +766,30 @@ const uint16_t i_letter_3x6[] = {
 
 // ###############################################################
 
+uint8_t get_themes_colors_len () {
+    return themes_colors_len;
+}
+
+void set_custom_theme_colors(uint32_t color1, uint32_t color2, uint32_t color3, uint32_t color4, uint32_t color5, uint32_t color6) {
+    themes_colors[0][0] = color1;
+    themes_colors[0][1] = color2;
+    themes_colors[0][2] = color3;
+    themes_colors[0][3] = color4;
+    themes_colors[0][4] = color5;
+    themes_colors[0][5] = color6;
+}
+
+void apply_current_theme(uint8_t current_theme) {
+    set_colors(
+        themes_colors[current_theme][0],
+        themes_colors[current_theme][1],
+        themes_colors[current_theme][2],
+        themes_colors[current_theme][3],
+        themes_colors[current_theme][4],
+        themes_colors[current_theme][5]
+    );
+}
+
 uint16_t rgb888_to_rgb565(uint32_t color) {
     uint16_t red = (((color & 0xff0000) / 0x10000) * 31 / 255);
     uint16_t green = (((color & 0x00ff00) / 0x100) * 63 / 255);
@@ -1175,67 +1218,7 @@ void clear_screen() {
     }
 }
 
-void set_colors(uint32_t color1, uint32_t color2, uint32_t color3, uint32_t color4, uint32_t black1, uint32_t black2) {
-
-    // https://lospec.com/palette-list/fuzzyfour good 
-    // uint32_t color1 = 0x302387u;
-    // uint32_t color2 = 0xff3796u;
-    // uint32_t color3 = 0x00faacu;
-    // uint32_t color4 = 0xfffdafu;
-    
-    // https://lospec.com/palette-list/lava-gb not so much
-    // uint32_t color1 = 0x051f39u;
-    // uint32_t color2 = 0x4a2480u;
-    // uint32_t color3 = 0xc53a9du;
-    // uint32_t color4 = 0xff8e80u;
-
-    // https://lospec.com/palette-list/kirokaze-gameboy good
-    // uint32_t color1 = 0x332c50u;
-    // uint32_t color2 = 0x46878fu;
-    // uint32_t color3 = 0x94e344u;
-    // uint32_t color4 = 0xe2f3e4u;
-
-    // https://lospec.com/palette-list/moonlight-gb
-    // uint32_t color1 = 0x0f052du;
-    // uint32_t color2 = 0x203671u;
-    // uint32_t color3 = 0x36868fu;
-    // uint32_t color4 = 0x5fc75du;
-
-    // https://lospec.com/palette-list/cherrymelon so so
-    // uint32_t color1 = 0xfcdeeau;
-    // uint32_t color2 = 0xff4d6du;
-    // uint32_t color3 = 0x265935u;
-    // uint32_t color4 = 0x012824u;
-
-    // // https://lospec.com/palette-list/hollow not so much
-    // uint32_t color1 = 0x0f0f1bu;
-    // uint32_t color2 = 0x565a75u;
-    // uint32_t color3 = 0xc6b7beu;
-    // uint32_t color4 = 0xfafbf6u;
-
-    // https://lospec.com/palette-list/bittersweet
-    // uint32_t color1 = 0x282328u;
-    // uint32_t color2 = 0x545c7eu;
-    // uint32_t color3 = 0xc56981u;
-    // uint32_t color4 = 0xa3a29au;
-
-    // https://lospec.com/palette-list/b4sement best one so far
-    // uint32_t color1 = 0x222323u;
-    // uint32_t color2 = 0xff4adcu;
-    // uint32_t color3 = 0x3dff98u;
-    // uint32_t color4 = 0xf0f6f0u;
-
-    // https://lospec.com/palette-list/americana
-    // uint32_t color1 = 0xfce4a8u;
-    // uint32_t color2 = 0x71969fu;
-    // uint32_t color3 = 0xd71a21u;
-    // uint32_t color4 = 0x01334eu;
-
-    // ######################## colors #################
-    
-    // uint32_t black = 0x000000u;
-    // uint32_t black_1 = 0xddddddu;
-
+void set_colors(uint32_t color1, uint32_t color2, uint32_t color3, uint32_t color4, uint32_t color5, uint32_t color6) {
     set_splash_num_color(color2);
     set_splash_bg_color(color1);
     
@@ -1245,7 +1228,11 @@ void set_colors(uint32_t color1, uint32_t color2, uint32_t color3, uint32_t colo
 
     set_snake_default_color(color3);
     set_snake_board_color(color1);
-    set_snake_board_1_color(black1);
+    #ifdef CONFIG_CHECKERED_BOARD
+        set_snake_board_1_color(color5);
+    #else
+        set_snake_board_1_color(color1);
+    #endif
 
     set_food_color(color2);
     set_snake_color_0(color2);
@@ -1267,8 +1254,8 @@ void set_colors(uint32_t color1, uint32_t color2, uint32_t color3, uint32_t colo
     set_bt_num_color(color4);
     set_bt_bg_color(color1);
 
-    set_frame_color(color4);
-    set_frame_color_1(black2);
+    set_frame_color(color5);
+    set_frame_color_1(color6);
 
     fill_buffer_color(buf_screen_area, buf_screen_size, get_splash_bg_color());
 }
