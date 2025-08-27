@@ -16,6 +16,7 @@ config ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
     select LV_USE_FLEX
     select LV_USE_ROLLER
     select LV_COLOR_SCREEN_TRANSP
+    select ZMK_WPM
 
 choice ZMK_DISPLAY_WORK_QUEUE
     default ZMK_DISPLAY_WORK_QUEUE_DEDICATED
@@ -45,7 +46,7 @@ choice LV_COLOR_DEPTH
 endchoice
 
 config LV_COLOR_16_SWAP
-	default y
+	default n
 
 config LV_DISP_DEF_REFR_PERIOD
     default 20

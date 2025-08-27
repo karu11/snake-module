@@ -45,7 +45,14 @@ static uint16_t bt_bg_color;
 static uint16_t frame_color;
 static uint16_t frame_color_1;
 
+static DefaultScreen default_screen = SNAKE_SCREEN;
+
 #define COLORS_PER_THEME 6
+
+typedef enum {
+    SNAKE_SCREEN,
+    STATUS_SCREEN,
+} DefaultScreen;
 
 static uint8_t themes_colors_len = 12;
 static uint32_t themes_colors[][COLORS_PER_THEME] = {
@@ -804,6 +811,10 @@ uint16_t rgb888_to_rgb565(uint32_t color) {
     return red_shifted | green_shifted | blue;
 }
 
+void set_default_screen(DefaultScreen screen) {
+    default_screen = screen;
+}
+
 void set_splash_num_color(uint32_t color) {
     splash_num_color = rgb888_to_rgb565(color);
 }
@@ -906,6 +917,10 @@ void set_bt_num_color(uint32_t color) {
 
 void set_bt_bg_color(uint32_t color) {
     bt_bg_color = rgb888_to_rgb565(color);
+}
+
+DefaultScreen get_default_screen() {
+    return default_screen;
 }
 
 uint16_t get_splash_num_color() {

@@ -23,10 +23,18 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include "battery_status.h"
 #include "helpers/display.h"
 
+#ifdef CONFIG_USE_BUZZER
+#include "helpers/buzzer.h"
+#endif
+
 static bool battery_widget_initialized = false;
+static bool battery_widget_running = false;
 static struct peripheral_battery_state battery_state_0;
 static struct peripheral_battery_state battery_state_1;
 static uint16_t *scaled_bitmap_1;
+
+static uint8_t previous_battery_level_0 = 0;
+static uint8_t previous_battery_level_1 = 0;
 
 static const uint16_t font_offset = 2;
 static const uint16_t scale = 6;
@@ -79,6 +87,28 @@ void set_battery_symbol() {
     print_percentage(battery_state_1.level, start_x_peripheral_2, start_y, scale, get_battery_num_color(), get_battery_bg_color(), get_battery_percentage_color());
 }
 
+#ifdef CONFIG_USE_BUZZER
+void alarm_peripheral_changed_status(struct peripheral_battery_state state) {
+    if (state.source == 0) {
+        if (previous_battery_level_0 == 0 && state.level != 0) {
+            play_coin_once();
+        }
+        if (previous_battery_level_0 != 0 && state.level == 0) {
+            play_reversed_coin_once();
+        }
+        previous_battery_level_0 = state.level;
+    } else {
+        if (previous_battery_level_1 == 0 && state.level != 0) {
+            play_coin_once();
+        }
+        if (previous_battery_level_1 != 0 && state.level == 0) {
+            play_reversed_coin_once();
+        }
+        previous_battery_level_1 = state.level;
+    }
+}
+#endif
+
 void battery_status_update_cb(struct peripheral_battery_state state) {
     if (state.source == 0) {
         battery_state_0 = state;
@@ -86,6 +116,11 @@ void battery_status_update_cb(struct peripheral_battery_state state) {
         battery_state_1 = state;
     }
     if (battery_widget_initialized) {
+        #ifdef CONFIG_USE_BUZZER
+        alarm_peripheral_changed_status(state);
+        #endif
+    }
+    if (battery_widget_running) {
         set_battery_symbol();
     }
 }
@@ -116,11 +151,15 @@ void zmk_widget_peripheral_battery_status_init() {
     widget_battery_status_init();
 }
 
-void start_battery_status() {
-    print_empty_batteries();
+void initialize_battery_status() {
     battery_widget_initialized = true;
 }
 
+void start_battery_status() {
+    print_empty_batteries();
+    battery_widget_running = true;
+}
+
 void stop_battery_status(void) {
-    battery_widget_initialized = false;
+    battery_widget_running = false;
 }

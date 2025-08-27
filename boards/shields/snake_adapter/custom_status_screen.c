@@ -32,8 +32,14 @@ void timer_splash(lv_timer_t * timer) {
     }
     if (splash_count >= SPLASH_FINAL_COUNT) {
         print_background();
-        start_snake();
         start_layer_switch();
+        initialize_battery_status();
+        DefaultScreen screen = get_default_screen();
+        if (screen == STATUS_SCREEN) {
+            print_menu();
+        } else {
+            start_snake();
+        }
 
         lv_timer_pause(timer);
         splash_finished = true;
@@ -53,11 +59,13 @@ lv_obj_t* zmk_display_status_screen() {
     app_buzzer_init();
     #endif
     
+    zmk_widget_peripheral_status_init();
     zmk_widget_splash_init();
     zmk_widget_snake_init();
     zmk_widget_output_status_init();
     zmk_widget_peripheral_battery_status_init();
     zmk_widget_layer_switch_init();
+
 
     lv_timer_create(timer_splash, SPLASH_DURATION, NULL);
     lv_timer_create(logo_animation_timer, CONFIG_LOGO_WALK_INTERVAL, NULL);

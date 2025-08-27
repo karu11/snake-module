@@ -71,6 +71,7 @@ void print_bitmap_transport(uint16_t *scaled_bitmap, Transport t, bool is_ready,
 void print_rectangle(uint8_t *buf_frame, uint16_t start_x, uint16_t end_x, uint16_t start_y, uint16_t end_y, uint16_t color, uint16_t scale);
 void render_filled_rectangle(uint8_t *buf_area, uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 
+void set_default_screen(DefaultScreen screen);
 void set_splash_num_color(uint32_t color);
 void set_splash_bg_color(uint32_t color);
 void set_snake_font_color(uint32_t color);
@@ -98,6 +99,7 @@ void set_symbol_bg_color(uint32_t color);
 void set_bt_num_color(uint32_t color);
 void set_bt_bg_color(uint32_t color);
 
+DefaultScreen get_default_screen();
 uint16_t get_splash_num_color(void);
 uint16_t get_splash_bg_color(void);
 uint16_t get_snake_font_color(void);

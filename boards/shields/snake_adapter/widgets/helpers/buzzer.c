@@ -17,6 +17,9 @@ LOG_MODULE_REGISTER(app_buzzer, LOG_LEVEL_DBG);
 #define FUNKYTOWN_NOTES 13
 #define MARIO_NOTES	37
 #define GOLIOTH_NOTES	21
+#define MEGALOVANIA_NOTES 22
+#define ONEUP_NOTES 6
+#define COIN_NOTES 2
 
 #define BUZZER_MAX_FREQ 2500
 #define BUZZER_MIN_FREQ 75
@@ -26,6 +29,7 @@ LOG_MODULE_REGISTER(app_buzzer, LOG_LEVEL_DBG);
 #define quarter	  150
 #define half	  300
 #define whole	  600
+#define dotted_eigth (sixteenth + eigth)
 
 #define C4  262
 #define Db4 277
@@ -63,23 +67,82 @@ LOG_MODULE_REGISTER(app_buzzer, LOG_LEVEL_DBG);
 #define A6  1760
 #define Bb6 1865
 #define B6  1976
+#define C7   2093
+#define Db7  2217
+#define D7   2349
+#define Eb7  2489
+#define E7   2637
+#define F7   2794
+#define Gb7  2960
+#define G7   3136
 
 #define REST 1
 
-static const struct pwm_dt_spec sBuzzer = PWM_DT_SPEC_GET(DT_ALIAS(buzzer_pwm));
+static const struct pwm_dt_spec sBuzzer = PWM_DT_SPEC_GET(DT_CHOSEN(zephyr_buzzer));
 
 enum song_choice {
 	beep,
 	funkytown,
 	mario,
-	golioth
+	golioth,
+	megalovania,
+	oneup,
+	oneup_half,
+	coin,
+	reversed_coin
 };
 
-enum song_choice song = 3;
+enum song_choice song = funkytown;
 
 struct note_duration {
 	int note;     /* hz */
 	int duration; /* msec */
+};
+
+static struct note_duration coin_song[COIN_NOTES] = {
+    {.note = B6, .duration = eigth},
+    {.note = E7, .duration = half},
+};
+
+static struct note_duration reversed_coin_song[COIN_NOTES] = {
+    {.note = E7, .duration = eigth},
+    {.note = B6, .duration = half},
+};
+
+static struct note_duration oneup_song[ONEUP_NOTES] = {
+    {.note = E5, .duration = dotted_eigth},
+    {.note = G5, .duration = dotted_eigth},
+    {.note = E6, .duration = dotted_eigth},
+    {.note = C6, .duration = dotted_eigth},
+    {.note = D6, .duration = dotted_eigth},
+    {.note = G6, .duration = half},
+};
+
+static struct note_duration megalovania_song[MEGALOVANIA_NOTES] = {
+    {.note = D4, .duration = eigth},
+    {.note = D4, .duration = eigth},
+    {.note = A4, .duration = eigth},
+    {.note = D5, .duration = sixteenth + eigth}, // dotted eighth
+    {.note = REST, .duration = sixteenth},
+    {.note = Db5, .duration = sixteenth},
+    {.note = C5, .duration = sixteenth},
+    {.note = Db5, .duration = sixteenth},
+    {.note = C5, .duration = eigth},
+    {.note = A4, .duration = eigth},
+    {.note = A4, .duration = eigth},
+
+    // Repeat the same pattern once
+    {.note = D4, .duration = eigth},
+    {.note = D4, .duration = eigth},
+    {.note = A4, .duration = eigth},
+    {.note = D5, .duration = sixteenth + eigth}, // dotted eighth
+    {.note = REST, .duration = sixteenth},
+    {.note = Db5, .duration = sixteenth},
+    {.note = C5, .duration = sixteenth},
+    {.note = Db5, .duration = sixteenth},
+    {.note = C5, .duration = eigth},
+    {.note = A4, .duration = eigth},
+    {.note = A4, .duration = eigth},
 };
 
 static struct note_duration funkytown_song[FUNKYTOWN_NOTES] = {
@@ -163,12 +226,12 @@ extern void buzzer_thread(void *d0, void *d1, void *d2)
 	k_sem_take(&buzzer_initialized_sem, K_FOREVER);
 	while (1) {
 		switch (song) {
-		case 0:
+		case beep:
 			LOG_DBG("beep");
 			pwm_set_dt(&sBuzzer, PWM_HZ(1000), PWM_HZ(1000) / 2);
 			k_msleep(100);
 			break;
-		case 1:
+		case funkytown:
 			LOG_DBG("funkytown");
 			for (int i = 0; i < FUNKYTOWN_NOTES; i++) {
 				if (funkytown_song[i].note < 10) {
@@ -183,7 +246,7 @@ extern void buzzer_thread(void *d0, void *d1, void *d2)
 			}
 			break;
 
-		case 2:
+		case mario:
 			LOG_DBG("mario");
 			for (int i = 0; i < MARIO_NOTES; i++) {
 				if (mario_song[i].note < 10) {
@@ -197,7 +260,7 @@ extern void buzzer_thread(void *d0, void *d1, void *d2)
 				}
 			}
 			break;
-		case 3:
+		case golioth:
 			LOG_DBG("golioth");
 			for (int i = 0; i < (sizeof(golioth_song) / sizeof(golioth_song[1])); i++) {
 				if (golioth_song[i].note < 10) {
@@ -208,6 +271,71 @@ extern void buzzer_thread(void *d0, void *d1, void *d2)
 					pwm_set_dt(&sBuzzer, PWM_HZ(golioth_song[i].note),
 						   PWM_HZ((golioth_song[i].note)) / 2);
 					k_msleep(golioth_song[i].duration);
+				}
+			}
+			break;
+		case megalovania:
+			LOG_DBG("megalovania");
+			for (int i = 0; i < MEGALOVANIA_NOTES; i++) {
+				if (megalovania_song[i].note < 10) {
+					pwm_set_pulse_dt(&sBuzzer, 0);
+					k_msleep(megalovania_song[i].duration);
+				} else {
+					pwm_set_dt(&sBuzzer, PWM_HZ(megalovania_song[i].note),
+							PWM_HZ(megalovania_song[i].note) / 2);
+					k_msleep(megalovania_song[i].duration);
+				}
+			}
+			break;
+		case oneup:
+			LOG_DBG("1up");
+			for (int i = 0; i < ONEUP_NOTES; i++) {
+				if (oneup_song[i].note < 10) {
+					pwm_set_pulse_dt(&sBuzzer, 0);
+					k_msleep(oneup_song[i].duration);
+				} else {
+					pwm_set_dt(&sBuzzer, PWM_HZ(oneup_song[i].note),
+							PWM_HZ(oneup_song[i].note) / 2);
+					k_msleep(oneup_song[i].duration);
+				}
+			}
+			break;
+		case oneup_half:
+			LOG_DBG("1up half");
+			for (int i = 0; i < ONEUP_NOTES; i++) {
+				if (oneup_song[i].note < 10) {
+					pwm_set_pulse_dt(&sBuzzer, 0);
+					k_msleep(oneup_song[i].duration);
+				} else {
+					pwm_set_dt(&sBuzzer, PWM_HZ(oneup_song[i].note),
+							PWM_HZ(oneup_song[i].note) / 10);
+					k_msleep(oneup_song[i].duration);
+				}
+			}
+			break;
+		case coin:
+			LOG_DBG("coin");
+			for (int i = 0; i < COIN_NOTES; i++) {
+				if (coin_song[i].note < 10) {
+					pwm_set_pulse_dt(&sBuzzer, 0);
+					k_msleep(coin_song[i].duration);
+				} else {
+					pwm_set_dt(&sBuzzer, PWM_HZ(coin_song[i].note),
+							PWM_HZ(coin_song[i].note) / 2);
+					k_msleep(coin_song[i].duration);
+				}
+			}
+			break;
+		case reversed_coin:
+			LOG_DBG("reversed coin");
+			for (int i = 0; i < COIN_NOTES; i++) {
+				if (reversed_coin_song[i].note < 10) {
+					pwm_set_pulse_dt(&sBuzzer, 0);
+					k_msleep(reversed_coin_song[i].duration);
+				} else {
+					pwm_set_dt(&sBuzzer, PWM_HZ(reversed_coin_song[i].note),
+							PWM_HZ(reversed_coin_song[i].note) / 2);
+					k_msleep(reversed_coin_song[i].duration);
 				}
 			}
 			break;
@@ -258,6 +386,36 @@ void play_golioth_once(void)
 {
 	song = golioth;
 	k_wakeup(buzzer_tid);
+}
+
+void play_megalovania_once(void)
+{
+	song = megalovania;
+	k_wakeup(buzzer_tid);
+}
+
+void play_oneup_once(void)
+{
+    song = oneup;
+    k_wakeup(buzzer_tid);
+}
+
+void play_oneup_half_once(void)
+{
+    song = oneup_half;
+    k_wakeup(buzzer_tid);
+}
+
+void play_coin_once(void)
+{
+    song = coin;
+    k_wakeup(buzzer_tid);
+}
+
+void play_reversed_coin_once(void)
+{
+    song = reversed_coin;
+    k_wakeup(buzzer_tid);
 }
 
 #else

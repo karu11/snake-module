@@ -84,6 +84,17 @@ void board_size() {
     }
 }
 
+void default_screen() {
+    const char *default_screen_str = CONFIG_DEFAULT_SCREEN;
+    if (strcmp(default_screen_str, "snake") == 0) {
+        set_default_screen(SNAKE_SCREEN);
+    } else if (strcmp(default_screen_str, "status") == 0) {
+        set_default_screen(STATUS_SCREEN);
+    } else {
+        set_default_screen(SNAKE_SCREEN);
+    }
+}
+
 void custom_theme() {
     uint32_t color1 = hex_string_to_uint(CONFIG_THEME_COLOR_1);
     uint32_t color2 = hex_string_to_uint(CONFIG_THEME_COLOR_2);
@@ -106,4 +117,5 @@ void custom_theme() {
 void configure(void) {
     custom_theme();
     board_size();
+    default_screen();
 }

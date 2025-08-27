@@ -11,4 +11,9 @@ void play_beep_once(void);
 void play_funkytown_once(void);
 void play_mario_once(void);
 void play_golioth_once(void);
+void play_megalovania_once(void);
+void play_oneup_once(void);
+void play_oneup_half_once(void);
+void play_coin_once(void);
+void play_reversed_coin_once(void);
 #endif

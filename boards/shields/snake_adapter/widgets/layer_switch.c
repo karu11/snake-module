@@ -21,7 +21,6 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/event_manager.h>
 #include <zmk/endpoints.h>
 #include <zmk/keymap.h>
-
 #include <zmk/display.h>
 
 #include "layer_switch.h"
@@ -70,7 +69,6 @@ void print_frames() {
     // theme frames
     print_container(buf_frame, 120, 240, 112, 160, thickness);
 
-
     // battery frames 
     print_container(buf_frame, 0, 120, 160, 240, thickness);
     print_container(buf_frame, 120, 240, 160, 240, thickness);
@@ -85,9 +83,6 @@ void print_menu() {
     set_status_symbol();
     set_battery_symbol();
     print_themes();
-    #ifdef CONFIG_USE_BUZZER
-    play_beep_once();
-    #endif
 }
 
 void toggle_menu() {
@@ -102,6 +97,9 @@ void toggle_menu() {
         print_menu();
         menu_on = true;
     }
+    #ifdef CONFIG_USE_BUZZER
+    play_coin_once();
+    #endif
 }
 
 void change_theme() {
@@ -109,19 +107,18 @@ void change_theme() {
     if (menu_on) {
         print_menu();
         apply_theme_snake();
+        #ifdef CONFIG_USE_BUZZER
+        play_oneup_once();
+        #endif
     } else {
         stop_snake();
         apply_theme_snake();
         restart_snake();
+        #ifdef CONFIG_USE_BUZZER
+        play_oneup_half_once();
+        #endif
     }
 }
-
-// void set_layer(uint8_t current_layer, uint8_t target_layer) {
-//     zmk_keymap_layer_deactivate(current_layer);
-//     zmk_keymap_layer_activate(target_layer);
-//     // maybe use this? 
-//     // int zmk_keymap_layer_to(zmk_keymap_layer_id_t layer);
-// }
 
 void set_layer_symbol() {
     if (dongle_lock) {
@@ -130,11 +127,9 @@ void set_layer_symbol() {
     dongle_lock = true;
     if (ls_state.index == menu_layer) {
         toggle_menu();
-        //set_layer(ls_state.index, base_layer);
     }
     if (ls_state.index == theme_layer) {
         change_theme();
-        //set_layer(ls_state.index, base_layer);
     }
     dongle_lock = false;
 }
@@ -160,7 +155,6 @@ void dongle_action_update_cb(struct zmk_dongle_actioned state) {
             set_layer_symbol();
         }
         pressed_timestamp = 0;
-        //released_timestamp = 0;
     }
 }
 
@@ -179,12 +173,9 @@ ZMK_SUBSCRIPTION(dongle_action, zmk_dongle_actioned);
 
 
 void zmk_widget_layer_switch_init() {
-	//widget_layer_status_init();
     dongle_action_init();
 
     buf_frame = (uint8_t*)k_malloc(320 * 2 * sizeof(uint8_t));
-
-    //snake_image_buf = k_malloc(snake_image_width * 2 * sizeof(uint16_t));
 }
 
 void start_layer_switch() {
