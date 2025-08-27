@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#if defined(CONFIG_BOARD_THINGY91_NRF9160_NS)
+#ifdef CONFIG_USE_BUZZER
 
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(app_buzzer, LOG_LEVEL_DBG);
@@ -272,4 +272,4 @@ void play_beep_once(void)
 	return;
 }
 
-#endif /* CONFIG_BOARD_THINGY91_NRF9160_NS */
+#endif

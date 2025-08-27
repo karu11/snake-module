@@ -29,6 +29,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include "output_status.h"
 #include "battery_status.h"
 #include "helpers/display.h"
+#include "helpers/buzzer.h"
 #include "theme.h"
 //#include "snake_image.h"
 #include "logo.h"
@@ -84,6 +85,9 @@ void print_menu() {
     set_status_symbol();
     set_battery_symbol();
     print_themes();
+    #ifdef CONFIG_USE_BUZZER
+    play_beep_once();
+    #endif
 }
 
 void toggle_menu() {
