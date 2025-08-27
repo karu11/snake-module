@@ -57,7 +57,7 @@ endchoice
 config PWM
     default y
 
-config LED
+config LED_PWM
     default y
 
 endif

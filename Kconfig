@@ -30,13 +30,17 @@ config SPLASH_USE_SNAKE_2
     bool "Use Snake 2 Splash screen"
     default n
 
+config USE_BUZZER
+    bool "Use buzzer"
+    default y
+
 config SNAKE_BOARD_SIZE
     string "Snake board size"
     default "XXL"
 
 config SNAKE_WALK_INTERVAL
     int "Snake walk interval"
-    default 30
+    default 10
 
 config LOGO_WALK_INTERVAL
     int "Logo walk interval"

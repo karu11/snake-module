@@ -17,6 +17,8 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
+#include "widgets/helpers/buzzer.h"
+
 //static const uint8_t LOGO_ANIMATION_DURATION = 40;logo_animation_timer
 
 static const uint8_t SPLASH_DURATION = 50;
@@ -46,6 +48,10 @@ lv_obj_t* zmk_display_status_screen() {
     init_display();
     theme_init();
     logo_animation_init();
+
+    #ifdef CONFIG_USE_BUZZER
+    app_buzzer_init();
+    #endif
     
     zmk_widget_splash_init();
     zmk_widget_snake_init();
