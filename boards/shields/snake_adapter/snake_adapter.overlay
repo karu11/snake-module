@@ -6,6 +6,7 @@
         //zmk,kscan = &kscan1;
         //zmk,backlight = &backlight;
         zephyr,display = &st7789v;
+		zephyr,buzzer = &buzzer;
     };
 
 	// kscan1: kscan {
