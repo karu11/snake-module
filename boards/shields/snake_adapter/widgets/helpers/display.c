@@ -12,7 +12,8 @@ static uint8_t screen_width;
 static uint8_t screen_height;
 static size_t buf_screen_size;
 
-static uint16_t splash_num_color;
+static uint16_t splash_logo_color;
+static uint16_t splash_created_by_color;
 static uint16_t splash_bg_color;
 
 static uint16_t snake_font_color;
@@ -42,6 +43,13 @@ static uint16_t symbol_bg_color;
 static uint16_t bt_num_color;
 static uint16_t bt_bg_color;
 
+static uint16_t theme_bg_color;
+static uint16_t theme_font_color;
+
+static uint16_t logo_bg_color;
+static uint16_t logo_font_color;
+static uint16_t logo_snake_color;
+
 static uint16_t frame_color;
 static uint16_t frame_color_1;
 
@@ -49,27 +57,199 @@ static DefaultScreen default_screen = SNAKE_SCREEN;
 
 #define COLORS_PER_THEME 6
 
-typedef enum {
-    SNAKE_SCREEN,
-    STATUS_SCREEN,
-} DefaultScreen;
-
-static uint8_t themes_colors_len = 12;
+static uint8_t themes_colors_len = 10;
 static uint32_t themes_colors[][COLORS_PER_THEME] = {
-    // primary   back       secondary
-    {0x222323u, 0xff4adcu, 0x3dff98u, 0xf0f6f0u, 0xf0f6f0u, 0xddddddu}, // C  - custom https://lospec.com/palette-list/b4sement
-    {0xd0d058u, 0x405010u, 0x708028u, 0xa0a840u, 0xf0f6f0u, 0xddddddu}, // 01 - https://lospec.com/palette-list/nostalgia
-    {0x222323u, 0xff4adcu, 0x3dff98u, 0xf0f6f0u, 0xf0f6f0u, 0xddddddu}, // 02 - https://lospec.com/palette-list/b4sement
-    {0xff3796u, 0x302387u, 0x00faacu, 0xfffdafu, 0xf0f6f0u, 0xddddddu}, // 03 - https://lospec.com/palette-list/fuzzyfour
-    {0x46878fu, 0x332c50u, 0x94e344u, 0xe2f3e4u, 0xf0f6f0u, 0xddddddu}, // 04 - https://lospec.com/palette-list/kirokaze-gameboy
-    {0x203671u, 0x0f052du, 0x36868fu, 0x5fc75du, 0xf0f6f0u, 0xddddddu}, // 05 - https://lospec.com/palette-list/moonlight-gb
-    {0xff4d6du, 0xfcdeeau, 0x265935u, 0x012824u, 0xf0f6f0u, 0xddddddu}, // 06 - https://lospec.com/palette-list/cherrymelon
-    {0x545c7eu, 0x282328u, 0xc56981u, 0xa3a29au, 0xf0f6f0u, 0xddddddu}, // 07 - https://lospec.com/palette-list/bittersweet
-    {0x71969fu, 0xfce4a8u, 0xd71a21u, 0x01334eu, 0xf0f6f0u, 0xddddddu}, // 08 - https://lospec.com/palette-list/americana
-    {0xc53a9du, 0x051f39u, 0x4a2480u, 0xff8e80u, 0xf0f6f0u, 0xddddddu}, // 09 - https://lospec.com/palette-list/lava-gb
-    {0xfb6634u, 0x2b2132u, 0x7e0d0du, 0xfeb746u, 0xf0f6f0u, 0xddddddu}, // 10 - https://lospec.com/gallery/2bitdream/of-the-earth
-    {0xecfffbu, 0x323859u, 0x576373u, 0x0c0421u, 0xf0f6f0u, 0xddddddu}, // 11 - https://lospec.com/gallery/dogmaster/cave
+    // primary  secondary  back1      back2
+    {0x3dff98u, 0xff4adcu, 0x222323u, 0x121313u, 0, 0}, // C  - custom https://lospec.com/palette-list/b4sement
+    {0xd0d058u, 0xa0a840u, 0x708028u, 0x405010u, 0, 0}, // 01 - https://lospec.com/palette-list/nostalgia
+    {0x3dff98u, 0xff4adcu, 0x222323u, 0x121313u, 0, 0}, // 02 - https://lospec.com/palette-list/b4sement
+    {0x94e344u, 0x46878fu, 0x332c50u, 0x231c40u, 0, 0}, // 03 - https://lospec.com/palette-list/kirokaze-gameboy
+    {0x5fc75du, 0x36868fu, 0x203671u, 0x0f052du, 0, 0}, // 04 - https://lospec.com/palette-list/moonlight-gb
+    {0xff4d6du, 0xfcdeeau, 0x265935u, 0x012824u, 0, 0}, // 05 - https://lospec.com/palette-list/cherrymelon
+    {0xc56981u, 0x545c7eu, 0xa3a29au, 0x282328u, 0, 0}, // 06 - https://lospec.com/palette-list/bittersweet
+    {0x71969fu, 0xfce4a8u, 0xd71a21u, 0x01334eu, 0, 0}, // 07 - https://lospec.com/palette-list/americana
+    {0xff8e80u, 0xc53a9du, 0x4a2480u, 0x051f39u, 0, 0}, // 08 - https://lospec.com/palette-list/lava-gb
+    {0xecfffbu, 0x576373u, 0x323859u, 0x0c0421u, 0, 0}, // 09 - https://lospec.com/gallery/dogmaster/cave
 };
+
+void set_complete_colors_theme() {
+    uint32_t splash_logo_color = hex_string_to_uint(CONFIG_SPLASH_LOGO_COLOR);
+    uint32_t splash_created_by_color = hex_string_to_uint(CONFIG_SPLASH_CREATED_BY_COLOR);
+    uint32_t splash_bg_color = hex_string_to_uint(CONFIG_SPLASH_BG_COLOR);
+    uint32_t snake_default_color = hex_string_to_uint(CONFIG_SNAKE_DEFAULT_COLOR);
+    uint32_t snake_board_color = hex_string_to_uint(CONFIG_SNAKE_BOARD_COLOR);
+    uint32_t snake_board_1_color = hex_string_to_uint(CONFIG_SNAKE_BOARD_1_COLOR);
+    uint32_t food_color = hex_string_to_uint(CONFIG_FOOD_COLOR);
+    uint32_t snake_color_0 = hex_string_to_uint(CONFIG_SNAKE_COLOR_0);
+    uint32_t snake_color_1 = hex_string_to_uint(CONFIG_SNAKE_COLOR_1);
+    uint32_t snake_color_2 = hex_string_to_uint(CONFIG_SNAKE_COLOR_2);
+    uint32_t snake_color_3 = hex_string_to_uint(CONFIG_SNAKE_COLOR_3);
+    uint32_t snake_color_4 = hex_string_to_uint(CONFIG_SNAKE_COLOR_4);
+    uint32_t snake_color_5 = hex_string_to_uint(CONFIG_SNAKE_COLOR_5);
+    uint32_t snake_color_6 = hex_string_to_uint(CONFIG_SNAKE_COLOR_6);
+    uint32_t battery_num_color = hex_string_to_uint(CONFIG_BATTERY_NUM_COLOR);
+    uint32_t battery_percentage_color = hex_string_to_uint(CONFIG_BATTERY_PERCENTAGE_COLOR);
+    uint32_t battery_bg_color = hex_string_to_uint(CONFIG_BATTERY_BG_COLOR);
+    uint32_t symbol_selected_color = hex_string_to_uint(CONFIG_SYMBOL_SELECTED_COLOR);
+    uint32_t symbol_unselected_color = hex_string_to_uint(CONFIG_SYMBOL_UNSELECTED_COLOR);
+    uint32_t symbol_bg_color = hex_string_to_uint(CONFIG_SYMBOL_BG_COLOR);
+    uint32_t bt_num_color = hex_string_to_uint(CONFIG_BT_NUM_COLOR);
+    uint32_t bt_bg_color = hex_string_to_uint(CONFIG_BT_BG_COLOR);
+    uint32_t theme_font_color = hex_string_to_uint(CONFIG_THEME_FONT_COLOR);
+    uint32_t theme_bg_color = hex_string_to_uint(CONFIG_THEME_BG_COLOR);
+    uint32_t logo_font_color = hex_string_to_uint(CONFIG_LOGO_FONT_COLOR);
+    uint32_t logo_snake_color = hex_string_to_uint(CONFIG_LOGO_SNAKE_COLOR);
+    uint32_t logo_bg_color = hex_string_to_uint(CONFIG_LOGO_BG_COLOR);
+    uint32_t frame_color = hex_string_to_uint(CONFIG_FRAME_COLOR);
+    uint32_t frame_color_1 = hex_string_to_uint(CONFIG_FRAME_COLOR_1);
+
+    if (splash_logo_color == HEX_PARSE_ERROR) {
+        splash_logo_color = 0xFFFFFF;
+    }
+
+    if (splash_created_by_color == HEX_PARSE_ERROR) {
+        splash_created_by_color = 0xFFFFFF;
+    }
+
+    if (splash_bg_color == HEX_PARSE_ERROR) {
+        splash_bg_color = 0xFFFFFF;
+    }
+
+    if (snake_default_color == HEX_PARSE_ERROR) {
+        snake_default_color = 0xFFFFFF;
+    }
+
+    if (snake_board_color == HEX_PARSE_ERROR) {
+        snake_board_color = 0xFFFFFF;
+    }
+
+    if (snake_board_1_color == HEX_PARSE_ERROR) {
+        snake_board_1_color = 0xFFFFFF;
+    }
+
+    if (food_color == HEX_PARSE_ERROR) {
+        food_color = 0xFFFFFF;
+    }
+
+    if (snake_color_0 == HEX_PARSE_ERROR) {
+        snake_color_0 = 0xFFFFFF;
+    }
+
+    if (snake_color_1 == HEX_PARSE_ERROR) {
+        snake_color_1 = 0xFFFFFF;
+    }
+
+    if (snake_color_2 == HEX_PARSE_ERROR) {
+        snake_color_2 = 0xFFFFFF;
+    }
+
+    if (snake_color_3 == HEX_PARSE_ERROR) {
+        snake_color_3 = 0xFFFFFF;
+    }
+
+    if (snake_color_4 == HEX_PARSE_ERROR) {
+        snake_color_4 = 0xFFFFFF;
+    }
+
+    if (snake_color_5 == HEX_PARSE_ERROR) {
+        snake_color_5 = 0xFFFFFF;
+    }
+
+    if (snake_color_6 == HEX_PARSE_ERROR) {
+        snake_color_6 = 0xFFFFFF;
+    }
+
+    if (battery_num_color == HEX_PARSE_ERROR) {
+        battery_num_color = 0xFFFFFF;
+    }
+
+    if (battery_percentage_color == HEX_PARSE_ERROR) {
+        battery_percentage_color = 0xFFFFFF;
+    }
+
+    if (battery_bg_color == HEX_PARSE_ERROR) {
+        battery_bg_color = 0xFFFFFF;
+    }
+
+    if (symbol_selected_color == HEX_PARSE_ERROR) {
+        symbol_selected_color = 0xFFFFFF;
+    }
+
+    if (symbol_unselected_color == HEX_PARSE_ERROR) {
+        symbol_unselected_color = 0xFFFFFF;
+    }
+
+    if (symbol_bg_color == HEX_PARSE_ERROR) {
+        symbol_bg_color = 0xFFFFFF;
+    }
+
+    if (bt_num_color == HEX_PARSE_ERROR) {
+        bt_num_color = 0xFFFFFF;
+    }
+
+    if (bt_bg_color == HEX_PARSE_ERROR) {
+        bt_bg_color = 0xFFFFFF;
+    }
+
+    if (theme_font_color == HEX_PARSE_ERROR) {
+        theme_font_color = 0xFFFFFF;
+    }
+
+    if (theme_bg_color == HEX_PARSE_ERROR) {
+        theme_bg_color = 0xFFFFFF;
+    }
+
+    if (logo_font_color == HEX_PARSE_ERROR) {
+        logo_font_color = 0xFFFFFF;
+    }
+
+    if (logo_snake_color == HEX_PARSE_ERROR) {
+        logo_snake_color = 0xFFFFFF;
+    }
+
+    if (logo_bg_color == HEX_PARSE_ERROR) {
+        logo_bg_color = 0xFFFFFF;
+    }
+
+    if (frame_color == HEX_PARSE_ERROR) {
+        frame_color = 0xFFFFFF;
+    }
+
+    if (frame_color_1 == HEX_PARSE_ERROR) {
+        frame_color_1 = 0xFFFFFF;
+    }
+
+    set_all_colors(
+        splash_logo_color,
+        splash_created_by_color,
+        splash_bg_color,
+        snake_default_color,
+        snake_board_color,
+        snake_board_1_color,
+        food_color,
+        snake_color_0,
+        snake_color_1,
+        snake_color_2,
+        snake_color_3,
+        snake_color_4,
+        snake_color_5,
+        snake_color_6,
+        battery_num_color,
+        battery_percentage_color,
+        battery_bg_color,
+        symbol_selected_color,
+        symbol_unselected_color,
+        symbol_bg_color,
+        bt_num_color,
+        bt_bg_color,
+        theme_font_color,
+        theme_bg_color,
+        logo_font_color,
+        logo_snake_color,
+        logo_bg_color,
+        frame_color,
+        frame_color_1);
+}
 
 static const uint16_t empty_bitmap_5x7[] = {
     0, 0, 0, 0, 0,
@@ -787,14 +967,18 @@ void set_custom_theme_colors(uint32_t color1, uint32_t color2, uint32_t color3, 
 }
 
 void apply_current_theme(uint8_t current_theme) {
-    set_colors(
-        themes_colors[current_theme][0],
-        themes_colors[current_theme][1],
-        themes_colors[current_theme][2],
-        themes_colors[current_theme][3],
-        themes_colors[current_theme][4],
-        themes_colors[current_theme][5]
-    );
+    if (CONFIG_USE_COMPLETE_CUSTOM_THEME && current_theme == 0) {
+        set_complete_colors_theme();
+    } else {
+        set_colorscheme(
+            themes_colors[current_theme][0],
+            themes_colors[current_theme][1],
+            themes_colors[current_theme][2],
+            themes_colors[current_theme][3],
+            themes_colors[current_theme][4],
+            themes_colors[current_theme][5]
+        );
+    }
 }
 
 uint16_t rgb888_to_rgb565(uint32_t color) {
@@ -815,8 +999,12 @@ void set_default_screen(DefaultScreen screen) {
     default_screen = screen;
 }
 
-void set_splash_num_color(uint32_t color) {
-    splash_num_color = rgb888_to_rgb565(color);
+void set_splash_logo_color(uint32_t color) {
+    splash_logo_color = rgb888_to_rgb565(color);
+}
+
+void set_splash_created_by_color(uint32_t color) {
+    splash_created_by_color = rgb888_to_rgb565(color);
 }
 
 void set_splash_bg_color(uint32_t color) {
@@ -911,6 +1099,26 @@ void set_symbol_bg_color(uint32_t color) {
     symbol_bg_color = rgb888_to_rgb565(color);
 }
 
+void set_logo_bg_color(uint32_t color) {
+    logo_bg_color = rgb888_to_rgb565(color);
+}
+
+void set_logo_font_color(uint32_t color) {
+    logo_font_color = rgb888_to_rgb565(color);
+}
+
+void set_logo_snake_color(uint32_t color) {
+    logo_snake_color = rgb888_to_rgb565(color);
+}
+
+void set_theme_bg_color(uint32_t color) {
+    theme_bg_color = rgb888_to_rgb565(color);
+}
+
+void set_theme_font_color(uint32_t color) {
+    theme_font_color = rgb888_to_rgb565(color);
+}
+
 void set_bt_num_color(uint32_t color) {
     bt_num_color = rgb888_to_rgb565(color);
 }
@@ -923,8 +1131,12 @@ DefaultScreen get_default_screen() {
     return default_screen;
 }
 
-uint16_t get_splash_num_color() {
-    return splash_num_color;
+uint16_t get_splash_created_by_color() {
+    return splash_created_by_color;
+}
+
+uint16_t get_splash_logo_color() {
+    return splash_logo_color;
 }
 
 uint16_t get_splash_bg_color() {
@@ -1007,6 +1219,26 @@ uint16_t get_symbol_unselected_color() {
     return symbol_unselected_color;
 }
 
+uint16_t get_theme_bg_color() {
+    return theme_bg_color;
+}
+
+uint16_t get_theme_font_color() {
+    return theme_font_color;
+}
+
+uint16_t get_logo_bg_color() {
+    return logo_bg_color;
+}
+
+uint16_t get_logo_font_color() {
+    return logo_font_color;
+}
+
+uint16_t get_logo_snake_color() {
+    return logo_snake_color;
+}
+
 uint16_t get_symbol_bg_color() {
     return symbol_bg_color;
 }
@@ -1027,6 +1259,32 @@ uint16_t get_frame_color_1() {
     return frame_color_1;
 }
 
+// Clamp function to ensure values stay within 0-255
+int clamp(int value) {
+    if (value < 0) return 0;
+    if (value > 255) return 255;
+    return value;
+}
+
+// Function to darken RGB color
+uint32_t darken_color(uint32_t rgb, float percentage) {
+    if (percentage < 0.0f) percentage = 0.0f;
+    if (percentage > 1.0f) percentage = 1.0f;
+
+    // Extract red, green, and blue components
+    uint32_t r = (rgb >> 16) & 0xFF;
+    uint32_t g = (rgb >> 8)  & 0xFF;
+    uint32_t b = rgb & 0xFF;
+
+    // Darken each component
+    r = clamp((uint32_t)(r * (1.0f - percentage)));
+    g = clamp((uint32_t)(g * (1.0f - percentage)));
+    b = clamp((uint32_t)(b * (1.0f - percentage)));
+
+    // Recombine into a single int
+    return (r << 16) | (g << 8) | b;
+}
+
 void display_write_wrapper(uint16_t x, uint16_t y, struct display_buffer_descriptor *buf_desc, uint8_t *buf) {
     display_write(display_dev, x, y, buf_desc, buf);
 }
@@ -1044,6 +1302,54 @@ void init_display(void) {
 	buf_screen_area = k_malloc(buf_screen_size);
     
 	//fill_buffer_color(buf_screen_area, buf_screen_size, get_splash_bg_color());
+}
+
+uint32_t hex_string_to_uint(const char *hex_str) {
+    if (!hex_str) {
+        return HEX_PARSE_ERROR;
+    }
+
+    uint32_t result = 0;
+    uint8_t i = 0;
+
+    // Optional "0x" or "0X" prefix
+    if (hex_str[0] == '0' && (hex_str[1] == 'x' || hex_str[1] == 'X')) {
+        i = 2;
+    }
+
+    if (hex_str[0] == '#') {
+        i = 1;
+    }
+
+    if (hex_str[i + 6] != '\0') {
+        // Not rgb hex
+        return HEX_PARSE_ERROR;
+    }
+
+    if (hex_str[i] == '\0') {
+        // Empty string after "0x"
+        return HEX_PARSE_ERROR;
+    }
+
+    for (; hex_str[i] != '\0'; ++i) {
+        char c = hex_str[i];
+        uint32_t digit;
+
+        if (isdigit(c)) {
+            digit = c - '0';
+        } else if (c >= 'a' && c <= 'f') {
+            digit = 10 + (c - 'a');
+        } else if (c >= 'A' && c <= 'F') {
+            digit = 10 + (c - 'A');
+        } else {
+            // Invalid character for hex
+            return HEX_PARSE_ERROR;
+        }
+
+        result = (result << 4) | digit;  // Multiply result by 16 and add digit
+    }
+
+    return result;
 }
 
 void fill_buffer_color(uint8_t *buf, size_t buf_size, uint32_t color) {
@@ -1233,44 +1539,116 @@ void clear_screen() {
     }
 }
 
-void set_colors(uint32_t color1, uint32_t color2, uint32_t color3, uint32_t color4, uint32_t color5, uint32_t color6) {
-    set_splash_num_color(color2);
-    set_splash_bg_color(color1);
-    
-    set_snake_font_color(color2);
-    set_snake_num_color(color3);
-    set_snake_bg_color(color1);
+void set_all_colors(
+    uint32_t splash_logo_color,
+    uint32_t splash_created_by_color,
+    uint32_t splash_bg_color,
+    uint32_t snake_default_color,
+    uint32_t snake_board_color,
+    uint32_t snake_board_1_color,
+    uint32_t food_color,
+    uint32_t snake_color_0,
+    uint32_t snake_color_1,
+    uint32_t snake_color_2,
+    uint32_t snake_color_3,
+    uint32_t snake_color_4,
+    uint32_t snake_color_5,
+    uint32_t snake_color_6,
+    uint32_t battery_num_color,
+    uint32_t battery_percentage_color,
+    uint32_t battery_bg_color,
+    uint32_t symbol_selected_color,
+    uint32_t symbol_unselected_color,
+    uint32_t symbol_bg_color,
+    uint32_t bt_num_color,
+    uint32_t bt_bg_color,
+    uint32_t theme_font_color,
+    uint32_t theme_bg_color,
+    uint32_t logo_font_color,
+    uint32_t logo_snake_color,
+    uint32_t logo_bg_color,
+    uint32_t frame_color,
+    uint32_t frame_color_1
+) {
+    set_splash_logo_color(splash_logo_color);
+    set_splash_created_by_color(splash_created_by_color);
+    set_splash_bg_color(splash_bg_color);
 
-    set_snake_default_color(color3);
-    set_snake_board_color(color1);
+    set_snake_default_color(snake_default_color);
+    set_snake_board_color(snake_board_color);
+    set_snake_board_1_color(snake_board_1_color);
+
+    set_food_color(food_color);
+    set_snake_color_0(snake_color_0);
+    set_snake_color_1(snake_color_1);
+    set_snake_color_2(snake_color_2);
+    set_snake_color_3(snake_color_3);
+    set_snake_color_4(snake_color_4);
+    set_snake_color_5(snake_color_5);
+    set_snake_color_6(snake_color_6);
+
+    set_battery_num_color(battery_num_color);
+    set_battery_percentage_color(battery_percentage_color);
+    set_battery_bg_color(battery_bg_color);
+
+    set_symbol_selected_color(symbol_selected_color);
+    set_symbol_unselected_color(symbol_unselected_color);
+    set_symbol_bg_color(symbol_bg_color);
+    set_bt_num_color(bt_num_color);
+    set_bt_bg_color(bt_bg_color);
+
+    set_theme_font_color(theme_font_color);
+    set_theme_bg_color(theme_bg_color);
+
+    set_logo_font_color(logo_font_color);
+    set_logo_snake_color(logo_snake_color);
+    set_logo_bg_color(logo_bg_color);
+
+    set_frame_color(frame_color);
+    set_frame_color_1(frame_color_1);
+}
+
+void set_colorscheme(uint32_t primary, uint32_t secondary, uint32_t background1, uint32_t background2, uint32_t color5, uint32_t color6) {
+    set_splash_logo_color(primary);
+    set_splash_created_by_color(background1);
+    set_splash_bg_color(background2);
+
+    set_snake_default_color(secondary);
+    set_snake_board_color(background2);
     #ifdef CONFIG_CHECKERED_BOARD
-        set_snake_board_1_color(color5);
+        set_snake_board_1_color(background1);
     #else
-        set_snake_board_1_color(color1);
+        set_snake_board_1_color(background2);
     #endif
 
-    set_food_color(color2);
-    set_snake_color_0(color2);
-    set_snake_color_1(color3);
-    set_snake_color_2(color4);
-    set_snake_color_3(color2);
-    set_snake_color_4(color3);
-    set_snake_color_5(color4);
-    set_snake_color_6(color2);
+    set_food_color(primary);
+    set_snake_color_0(primary);
+    set_snake_color_1(secondary);
+    set_snake_color_2(background1);
+    set_snake_color_3(secondary);
+    set_snake_color_4(primary);
+    set_snake_color_5(secondary);
+    set_snake_color_6(background1);
 
-    set_battery_num_color(color3);
-    set_battery_percentage_color(color2);
-    set_battery_bg_color(color1);
+    set_battery_num_color(primary);
+    set_battery_percentage_color(background1);
+    set_battery_bg_color(background2);
 
-    set_symbol_selected_color(color3);
-    set_symbol_unselected_color(color2);
-    set_symbol_bg_color(color1);
+    set_symbol_selected_color(primary);
+    set_symbol_unselected_color(background1);
+    set_symbol_bg_color(background2);
+    set_bt_num_color(secondary);
+    set_bt_bg_color(background2);
 
-    set_bt_num_color(color4);
-    set_bt_bg_color(color1);
+    set_theme_font_color(primary);
+    set_theme_bg_color(background2);
 
-    set_frame_color(color5);
-    set_frame_color_1(color6);
+    set_logo_font_color(primary);
+    set_logo_snake_color(secondary);
+    set_logo_bg_color(background2);
+
+    set_frame_color(background1);
+    set_frame_color_1(darken_color(background1, 0.1));
 
     fill_buffer_color(buf_screen_area, buf_screen_size, get_splash_bg_color());
 }

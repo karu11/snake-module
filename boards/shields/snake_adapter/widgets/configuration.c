@@ -1,52 +1,6 @@
 #include <stdlib.h>
 #include "helpers/display.h"
 
-#define HEX_PARSE_ERROR ((uint32_t)-1)
-
-uint32_t hex_string_to_uint(const char *hex_str) {
-    if (!hex_str) {
-        return HEX_PARSE_ERROR;
-    }
-
-    uint32_t result = 0;
-    uint8_t i = 0;
-
-    // Optional "0x" or "0X" prefix
-    if (hex_str[0] == '0' && (hex_str[1] == 'x' || hex_str[1] == 'X')) {
-        i = 2;
-    }
-
-    if (hex_str[i + 6] != '\0') {
-        // Not rgb hex
-        return HEX_PARSE_ERROR;
-    }
-
-    if (hex_str[i] == '\0') {
-        // Empty string after "0x"
-        return HEX_PARSE_ERROR;
-    }
-
-    for (; hex_str[i] != '\0'; ++i) {
-        char c = hex_str[i];
-        uint32_t digit;
-
-        if (isdigit(c)) {
-            digit = c - '0';
-        } else if (c >= 'a' && c <= 'f') {
-            digit = 10 + (c - 'a');
-        } else if (c >= 'A' && c <= 'F') {
-            digit = 10 + (c - 'A');
-        } else {
-            // Invalid character for hex
-            return HEX_PARSE_ERROR;
-        }
-
-        result = (result << 4) | digit;  // Multiply result by 16 and add digit
-    }
-
-    return result;
-}
-
 void board_size() {
     const char *size_str = CONFIG_SNAKE_BOARD_SIZE;
     if (strcmp(size_str, "XXXL") == 0) {
@@ -108,14 +62,16 @@ void custom_theme() {
         color4 == HEX_PARSE_ERROR ||
         color5 == HEX_PARSE_ERROR ||
         color6 == HEX_PARSE_ERROR) {
-        set_custom_theme_colors(0x4aedffu, 0xff8acdu, 0xb03e80u, 0xffffffu, 0x000000u, 0xddddddu);
+        set_custom_theme_colors(0x4aedffu, 0xff8acdu, 0xb03e80u, 0xFFFFFFu, 0x000000u, 0xddddddu);
     } else {
         set_custom_theme_colors(color1, color2, color3, color4, color5, color6);
     }
 }
 
 void configure(void) {
-    custom_theme();
+    if (!CONFIG_USE_COMPLETE_CUSTOM_THEME) {
+        custom_theme();
+    }
     board_size();
     default_screen();
 }

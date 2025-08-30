@@ -1,5 +1,7 @@
 #include <zephyr/kernel.h>
 
+#define HEX_PARSE_ERROR ((uint32_t)-1)
+
 typedef enum {
     CHAR_0,
     CHAR_1,
@@ -62,6 +64,11 @@ typedef enum {
     FONT_SIZE_3x6,
 } FontSize;
 
+typedef enum {
+    SNAKE_SCREEN,
+    STATUS_SCREEN,
+} DefaultScreen;
+
 void fill_buffer_color(uint8_t *buf, size_t buf_size, uint32_t color);
 void init_display(void);
 void display_write_wrapper(uint16_t x, uint16_t y, struct display_buffer_descriptor *buf_desc, uint8_t *buf);
@@ -72,7 +79,8 @@ void print_rectangle(uint8_t *buf_frame, uint16_t start_x, uint16_t end_x, uint1
 void render_filled_rectangle(uint8_t *buf_area, uint8_t x, uint8_t y, uint8_t width, uint8_t height);
 
 void set_default_screen(DefaultScreen screen);
-void set_splash_num_color(uint32_t color);
+void set_splash_logo_color(uint32_t color);
+void set_splash_created_by_color(uint32_t color);
 void set_splash_bg_color(uint32_t color);
 void set_snake_font_color(uint32_t color);
 void set_snake_num_color(uint32_t color);
@@ -96,11 +104,17 @@ void set_frame_color_1(uint32_t color);
 void set_symbol_selected_color(uint32_t color);
 void set_symbol_unselected_color(uint32_t color);
 void set_symbol_bg_color(uint32_t color);
+void set_theme_bg_color(uint32_t color);
+void set_theme_font_color(uint32_t color);
+void set_logo_bg_color(uint32_t color);
+void set_logo_font_color(uint32_t color);
+void set_logo_snake_color(uint32_t color);
 void set_bt_num_color(uint32_t color);
 void set_bt_bg_color(uint32_t color);
 
 DefaultScreen get_default_screen();
-uint16_t get_splash_num_color(void);
+uint16_t get_splash_logo_color(void);
+uint16_t get_splash_created_by_color(void);
 uint16_t get_splash_bg_color(void);
 uint16_t get_snake_font_color(void);
 uint16_t get_snake_num_color(void);
@@ -123,16 +137,23 @@ uint16_t get_battery_percentage_color(void);
 uint16_t get_symbol_selected_color(void);
 uint16_t get_symbol_unselected_color(void);
 uint16_t get_symbol_bg_color(void);
+uint16_t get_theme_bg_color(void);
+uint16_t get_theme_font_color(void);
+uint16_t get_logo_bg_color(void);
+uint16_t get_logo_font_color(void);
+uint16_t get_logo_snake_color(void);
 uint16_t get_bt_num_color(void);
 uint16_t get_bt_bg_color(void);
 uint16_t get_frame_color(void);
 uint16_t get_frame_color_1(void);
 
 void clear_screen(void);
-void set_colors(uint32_t color1, uint32_t color2, uint32_t color3, uint32_t color4, uint32_t color5, uint32_t color6);
+void set_colorscheme(uint32_t color1, uint32_t color2, uint32_t color3, uint32_t color4, uint32_t color5, uint32_t color6);
 void print_string(uint16_t *scaled_bitmap, Character str[], uint16_t x, uint16_t y, uint16_t scale, uint16_t color, uint16_t bg_color, FontSize font_size, uint16_t gap_pixels, uint8_t strLen);
 
 uint8_t get_themes_colors_len(void);
 void set_custom_theme_colors(uint32_t color1, uint32_t color2, uint32_t color3, uint32_t color4, uint32_t color5, uint32_t color6);
-void set_colors(uint32_t color1, uint32_t color2, uint32_t color3, uint32_t color4, uint32_t color5, uint32_t color6);
 void apply_current_theme(uint8_t current_theme);
+uint32_t darken_color(uint32_t rgb, float percentage);
+void set_complete_colors_theme();
+uint32_t hex_string_to_uint(const char *hex_str);

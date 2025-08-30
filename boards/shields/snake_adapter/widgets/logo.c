@@ -178,7 +178,7 @@ uint8_t get_section_num_on_corners(Section s) {
 void print_animation(Section s, uint16_t animation_sprite[]) {
     uint16_t x = (s.x * 6 * logo_animation_scale) + logo_animation_x;
     uint16_t y = (s.y * 6 * logo_animation_scale) + logo_animation_y;
-    render_bitmap(snake_animation_buf, animation_sprite, x, y, 6, 6, logo_animation_scale, get_symbol_unselected_color(), get_symbol_bg_color());
+    render_bitmap(snake_animation_buf, animation_sprite, x, y, 6, 6, logo_animation_scale, get_logo_snake_color(), get_logo_bg_color());
 }
 
 void print_animation_body(Section s) {
@@ -246,7 +246,7 @@ void print_initial_animation() {
     };
     uint16_t char_gap_pixels = snake_logo_font_scale;
     uint8_t logo_chars_len = 5;
-    print_string(snake_logo_buf, logo_chars, snake_logo_x, snake_logo_y, snake_logo_font_scale, get_symbol_unselected_color(), get_symbol_bg_color(), FONT_SIZE_3x5, char_gap_pixels, logo_chars_len);
+    print_string(snake_logo_buf, logo_chars, snake_logo_x, snake_logo_y, snake_logo_font_scale, get_logo_font_color(), get_logo_bg_color(), FONT_SIZE_3x5, char_gap_pixels, logo_chars_len);
     
     for (uint16_t i; i < animation_sections_total; i++) {
         Section s = get_section(i);

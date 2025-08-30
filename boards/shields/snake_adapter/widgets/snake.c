@@ -25,6 +25,10 @@ LOG_MODULE_REGISTER(sample, LOG_LEVEL_INF);
 #include "helpers/list.h"
 #include "helpers/display.h"
 
+#ifdef CONFIG_USE_BUZZER
+#include "helpers/buzzer.h"
+#endif
+
 struct snake_wpm_status_state {
     uint8_t wpm;
 };
@@ -570,6 +574,11 @@ static void render_snake(void) {
     }
     walk_render();
     if (walk_index >= draw_index) {
+        #ifdef CONFIG_USE_BUZZER
+            #ifdef CONFIG_USE_FOOD_SOUND
+                play_beep_once();
+            #endif
+        #endif
         if (snake_died) {
             finalize_snake();
             return;
@@ -725,10 +734,15 @@ void zmk_widget_snake_init() {
     widget_snake_init();
 }
 
-void start_snake() {
+void initialize_snake_game() {
     lv_timer_create(timer_snake, CONFIG_SNAKE_WALK_INTERVAL, NULL);
     
     snake_widget_initialized = true;
+    stopped = true;
+}
+
+void start_snake() {
+    stopped = true;
 }
 
 void stop_snake() {
