@@ -34,13 +34,13 @@ config SPLASH_USE_SNAKE_2
     bool "Use Snake 2 Splash screen"
     default n
 
-config USE_COMPLETE_CUSTOM_THEME
-    bool "Complete custom theme"
-    default n
-
 config USE_FOOD_SOUND
     bool "Use food sound"
-    default y
+    default n
+
+config USE_DIE_SOUND
+    bool "Use food sound"
+    default n
 
 config USE_STATUS_SOUND
     bool "Use status sound"
@@ -48,11 +48,11 @@ config USE_STATUS_SOUND
 
 config USE_THEME_SOUND
     bool "Use theme sound"
-    default y
+    default n
 
 config USE_MENU_SOUND
     bool "Use menu sound"
-    default y
+    default n
 
 config USE_BUZZER
     bool "Use buzzer"
@@ -60,7 +60,7 @@ config USE_BUZZER
 
 config SNAKE_BOARD_SIZE
     string "Snake board size"
-    default "XXL"
+    default "XL"
 
 config SNAKE_WALK_INTERVAL
     int "Snake walk interval"
@@ -89,6 +89,10 @@ config WPM_FAST
 config WPM_SUPER_FAST
     int "WPM super fast"
     default 90
+    
+config USE_COMPLETE_CUSTOM_THEME
+    bool "Complete custom theme"
+    default n
 
 config SPLASH_LOGO_COLOR
     string ""
@@ -158,6 +162,18 @@ config BATTERY_BG_COLOR
     string ""
     default "000000"
 
+config BATTERY_NUM_COLOR_1
+    string ""
+    default "000000"
+
+config BATTERY_PERCENTAGE_COLOR_1
+    string ""
+    default "000000"
+
+config BATTERY_BG_COLOR_1
+    string ""
+    default "000000"
+
 config SYMBOL_SELECTED_COLOR
     string ""
     default "000000"
@@ -170,6 +186,22 @@ config SYMBOL_BG_COLOR
     string ""
     default "000000"
 
+config BT_STATUS_OK_COLOR
+    string ""
+    default "000000"
+
+config BT_STATUS_NOT_OK_COLOR
+    string ""
+    default "000000"
+
+config BT_STATUS_OPEN_COLOR
+    string ""
+    default "000000"
+
+config BT_STATUS_BG_COLOR
+    string ""
+    default "000000"
+
 config BT_NUM_COLOR
     string ""
     default "000000"
@@ -179,6 +211,10 @@ config BT_BG_COLOR
     default "000000"
 
 config THEME_FONT_COLOR
+    string ""
+    default "000000"
+
+config THEME_FONT_COLOR_1
     string ""
     default "000000"
 
@@ -203,6 +239,10 @@ config FRAME_COLOR
     default "000000"
 
 config FRAME_COLOR_1
+    string ""
+    default "000000"
+
+config MENU_BG_COLOR
     string ""
     default "000000"
 

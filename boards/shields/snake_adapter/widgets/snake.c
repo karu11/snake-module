@@ -42,12 +42,6 @@ static struct snake_wpm_status_state snake_state;
 // ############## SPEED ############
 
 typedef enum {
-    DECIMAL_PLACES_1,
-    DECIMAL_PLACES_2,
-    DECIMAL_PLACES_3,
-} DecimalPlaces;
-
-typedef enum {
     SPEED_SUPER_SLOW,
     SPEED_SLOW,
     SPEED_MEDIUM,
@@ -576,10 +570,15 @@ static void render_snake(void) {
     if (walk_index >= draw_index) {
         #ifdef CONFIG_USE_BUZZER
             #ifdef CONFIG_USE_FOOD_SOUND
-                play_beep_once();
+                play_connected_song();
             #endif
         #endif
         if (snake_died) {
+            #ifdef CONFIG_USE_BUZZER
+                #ifdef CONFIG_USE_DIE_SOUND
+                    play_powerd_down_song();
+                #endif
+            #endif
             finalize_snake();
             return;
         }
@@ -742,14 +741,10 @@ void initialize_snake_game() {
 }
 
 void start_snake() {
-    stopped = true;
+    stopped = false;
 }
 
 void stop_snake() {
     stopped = true;
     finalize_snake();
-}
-
-void restart_snake() {
-    stopped = false;
 }

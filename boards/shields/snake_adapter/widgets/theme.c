@@ -55,19 +55,19 @@ void print_themes() {
     uint8_t num = current_theme;
     uint16_t first_num = current_theme / 10;
     uint16_t second_num = current_theme % 10;
-    uint16_t theme_x_custom = theme_x + 8;
+    uint16_t theme_x_custom = theme_x + 6;
 
 
     uint16_t char_gap_pixels = 2;
     if (num == 0) {
         print_string(scaled_bitmap_theme_font, theme_template, theme_x_custom, theme_y, theme_font_scale, get_theme_font_color(), get_theme_bg_color(), FONT_SIZE_3x5, char_gap_pixels, 4);
-        print_bitmap(scaled_bitmap_theme_font, CHAR_C, theme_x_custom + 62, theme_y, theme_font_scale, get_theme_font_color(), get_theme_bg_color(), FONT_SIZE_3x5);
-        print_bitmap(scaled_bitmap_theme_font, CHAR_NONE, theme_x_custom + 76, theme_y, theme_font_scale, get_theme_font_color(), get_theme_bg_color(), FONT_SIZE_3x5);
+        print_bitmap(scaled_bitmap_theme_font, CHAR_C, theme_x_custom + 62, theme_y, theme_font_scale, get_theme_font_color_1(), get_theme_bg_color(), FONT_SIZE_3x5);
+        print_bitmap(scaled_bitmap_theme_font, CHAR_NONE, theme_x_custom + 76, theme_y, theme_font_scale, get_theme_font_color_1(), get_theme_bg_color(), FONT_SIZE_3x5);
         return;
     }
     print_string(scaled_bitmap_theme_font, theme_template, theme_x, theme_y, theme_font_scale, get_theme_font_color(), get_theme_bg_color(), FONT_SIZE_3x5, char_gap_pixels, 4);
-    print_bitmap(scaled_bitmap_theme_font, int_to_num_char(first_num), theme_x + 62, theme_y, theme_font_scale, get_theme_font_color(), get_theme_bg_color(), FONT_SIZE_3x5);
-    print_bitmap(scaled_bitmap_theme_font, int_to_num_char(second_num), theme_x + 76, theme_y, theme_font_scale, get_theme_font_color(), get_theme_bg_color(), FONT_SIZE_3x5);
+    print_bitmap(scaled_bitmap_theme_font, int_to_num_char(first_num), theme_x + 62, theme_y, theme_font_scale, get_theme_font_color_1(), get_theme_bg_color(), FONT_SIZE_3x5);
+    print_bitmap(scaled_bitmap_theme_font, int_to_num_char(second_num), theme_x + 76, theme_y, theme_font_scale, get_theme_font_color_1(), get_theme_bg_color(), FONT_SIZE_3x5);
 }
 
 void set_next_theme_number() {

@@ -14,245 +14,194 @@ LOG_MODULE_REGISTER(app_buzzer, LOG_LEVEL_DBG);
 #include <zephyr/drivers/pwm.h>
 #include <zephyr/kernel.h>
 #include "settings.h"
+#include "buzzer.h"
+#include "pwm.h"
+
+#define BUZZER_STACK 1024
 
 #define FUNKYTOWN_NOTES 13
 #define MARIO_NOTES	37
-#define GOLIOTH_NOTES	21
+#define GOLIOTH_NOTES 21
 #define MEGALOVANIA_NOTES 22
 #define ONEUP_NOTES 6
 #define COIN_NOTES 2
-#define COIN_CHORDS_NOTES 2
-
-#define BUZZER_MAX_FREQ 2500
-#define BUZZER_MIN_FREQ 75
-
-#define sixteenth 38
-#define eigth	  75
-#define quarter	  150
-#define half	  300
-#define whole	  600
-#define dotted_eigth (sixteenth + eigth)
-
-#define C4  262
-#define Db4 277
-#define D4  294
-#define Eb4 311
-#define E4  330
-#define F4  349
-#define Gb4 370
-#define G4  392
-#define Ab4 415
-#define A4  440
-#define Bb4 466
-#define B4  494
-#define C5  523
-#define Db5 554
-#define D5  587
-#define Eb5 622
-#define E5  659
-#define F5  698
-#define Gb5 740
-#define G5  784
-#define Ab5 831
-#define A5  880
-#define Bb5 932
-#define B5  988
-#define C6  1046
-#define Db6 1109
-#define D6  1175
-#define Eb6 1245
-#define E6  1319
-#define F6  1397
-#define Gb6 1480
-#define G6  1568
-#define Ab6 1661
-#define A6  1760
-#define Bb6 1865
-#define B6  1976
-#define C7   2093
-#define Db7  2217
-#define D7   2349
-#define Eb7  2489
-#define E7   2637
-#define F7   2794
-#define Gb7  2960
-#define G7   3136
-
-#define REST 1
+#define BEEP_NOTES 1
+#define COIN_CHORDS_COUNT 2
+#define CRAZY_COIN_NOTES 48
 
 static const struct pwm_dt_spec sBuzzer = PWM_DT_SPEC_GET(DT_CHOSEN(zephyr_buzzer));
 
-enum song_choice {
-	beep,
-	funkytown,
-	mario,
-	golioth,
-	megalovania,
-	oneup,
-	oneup_half,
-	coin,
-	reversed_coin,
-	coin_polyphonic,
+SongName song = funkytown;
+
+static const int coin_chord1[] = { B5 };
+static const int coin_chord2[] = { E6 };
+
+static Chord coin_chords[COIN_CHORDS_COUNT] = {
+	{.note_count = 2, .duration = EIGTH, .notes = coin_chord1},
+	{.note_count = 2, .duration = HALF, .notes = coin_chord2},
 };
 
-enum song_choice song = funkytown;
-
-struct note_duration {
-	int note;     /* hz */
-	int duration; /* msec */
+static Sound coin_song[COIN_NOTES] = {
+    {.note = B6, .duration = EIGTH},
+    {.note = E7, .duration = HALF},
 };
 
-struct chord {
-	const int *notes;
-	int note_count;
-	int duration;
+static Sound crazy_coin_song[CRAZY_COIN_NOTES] = {
+    {.note = B5, .duration = SIXTY_FOURTH},
+    {.note = B6, .duration = SIXTY_FOURTH},
+    {.note = B5, .duration = SIXTY_FOURTH},
+    {.note = B6, .duration = SIXTY_FOURTH},
+    {.note = B5, .duration = SIXTY_FOURTH},
+    {.note = B6, .duration = SIXTY_FOURTH},
+    {.note = B5, .duration = SIXTY_FOURTH},
+    {.note = B6, .duration = SIXTY_FOURTH},
+    {.note = B5, .duration = SIXTY_FOURTH},
+    {.note = B6, .duration = SIXTY_FOURTH},
+    {.note = B5, .duration = SIXTY_FOURTH},
+    {.note = B6, .duration = SIXTY_FOURTH},
+    {.note = B5, .duration = SIXTY_FOURTH},
+    {.note = B6, .duration = SIXTY_FOURTH},
+    {.note = B5, .duration = SIXTY_FOURTH},
+    {.note = B6, .duration = SIXTY_FOURTH},
+
+    {.note = E6, .duration = SIXTY_FOURTH},
+    {.note = E7, .duration = SIXTY_FOURTH},
+    {.note = E6, .duration = SIXTY_FOURTH},
+    {.note = E7, .duration = SIXTY_FOURTH},
+    {.note = E6, .duration = SIXTY_FOURTH},
+    {.note = E7, .duration = SIXTY_FOURTH},
+    {.note = E6, .duration = SIXTY_FOURTH},
+    {.note = E7, .duration = SIXTY_FOURTH},
+    {.note = E6, .duration = SIXTY_FOURTH},
+    {.note = E7, .duration = SIXTY_FOURTH},
+    {.note = E6, .duration = SIXTY_FOURTH},
+    {.note = E7, .duration = SIXTY_FOURTH},
+    {.note = E6, .duration = SIXTY_FOURTH},
+    {.note = E7, .duration = SIXTY_FOURTH},
+    {.note = E6, .duration = SIXTY_FOURTH},
+    {.note = E7, .duration = SIXTY_FOURTH},
+    {.note = E6, .duration = SIXTY_FOURTH},
+    {.note = E7, .duration = SIXTY_FOURTH},
+    {.note = E6, .duration = SIXTY_FOURTH},
+    {.note = E7, .duration = SIXTY_FOURTH},
+    {.note = E6, .duration = SIXTY_FOURTH},
+    {.note = E7, .duration = SIXTY_FOURTH},
+    {.note = E6, .duration = SIXTY_FOURTH},
+    {.note = E7, .duration = SIXTY_FOURTH},
+    {.note = E6, .duration = SIXTY_FOURTH},
+    {.note = E7, .duration = SIXTY_FOURTH},
+    {.note = E6, .duration = SIXTY_FOURTH},
+    {.note = E7, .duration = SIXTY_FOURTH},
+    {.note = E6, .duration = SIXTY_FOURTH},
+    {.note = E7, .duration = SIXTY_FOURTH},
+    {.note = E6, .duration = SIXTY_FOURTH},
+    {.note = E7, .duration = SIXTY_FOURTH},
 };
 
-static const int coin_chord1[] = { B6, E7 };
-static const int coin_chord2[] = { B5, E6 };
-
-static struct chord coin_chords[COIN_CHORDS_NOTES] = {
-	{.notes = coin_chord1, .note_count = 2, .duration = eigth},
-	{.notes = coin_chord2, .note_count = 2, .duration = half},
+static Sound reversed_coin_song[COIN_NOTES] = {
+    {.note = E7, .duration = EIGTH},
+    {.note = B6, .duration = HALF},
 };
 
-static struct note_duration coin_song[COIN_NOTES] = {
-    {.note = B6, .duration = eigth},
-    {.note = E7, .duration = half},
+static Sound beep_song[BEEP_NOTES] = {
+    {.note = 1000, .duration = 100},
 };
 
-static struct note_duration reversed_coin_song[COIN_NOTES] = {
-    {.note = E7, .duration = eigth},
-    {.note = B6, .duration = half},
+static Sound oneup_song[ONEUP_NOTES] = {
+    {.note = E5, .duration = DOTTED_EIGTH},
+    {.note = G5, .duration = DOTTED_EIGTH},
+    {.note = E6, .duration = DOTTED_EIGTH},
+    {.note = C6, .duration = DOTTED_EIGTH},
+    {.note = D6, .duration = DOTTED_EIGTH},
+    {.note = G6, .duration = HALF},
 };
 
-static struct note_duration oneup_song[ONEUP_NOTES] = {
-    {.note = E5, .duration = dotted_eigth},
-    {.note = G5, .duration = dotted_eigth},
-    {.note = E6, .duration = dotted_eigth},
-    {.note = C6, .duration = dotted_eigth},
-    {.note = D6, .duration = dotted_eigth},
-    {.note = G6, .duration = half},
-};
-
-static struct note_duration megalovania_song[MEGALOVANIA_NOTES] = {
-    {.note = D4, .duration = eigth},
-    {.note = D4, .duration = eigth},
-    {.note = A4, .duration = eigth},
-    {.note = D5, .duration = sixteenth + eigth}, // dotted eigth
-    {.note = REST, .duration = sixteenth},
-    {.note = Db5, .duration = sixteenth},
-    {.note = C5, .duration = sixteenth},
-    {.note = Db5, .duration = sixteenth},
-    {.note = C5, .duration = eigth},
-    {.note = A4, .duration = eigth},
-    {.note = A4, .duration = eigth},
+static Sound megalovania_song[MEGALOVANIA_NOTES] = {
+    {.note = D4, .duration = EIGTH},
+    {.note = D4, .duration = EIGTH},
+    {.note = A4, .duration = EIGTH},
+    {.note = D5, .duration = SIXTEENTH + EIGTH}, // dotted EIGTH
+    {.note = REST, .duration = SIXTEENTH},
+    {.note = Db5, .duration = SIXTEENTH},
+    {.note = C5, .duration = SIXTEENTH},
+    {.note = Db5, .duration = SIXTEENTH},
+    {.note = C5, .duration = EIGTH},
+    {.note = A4, .duration = EIGTH},
+    {.note = A4, .duration = EIGTH},
 
     // Repeat the same pattern once
-    {.note = D4, .duration = eigth},
-    {.note = D4, .duration = eigth},
-    {.note = A4, .duration = eigth},
-    {.note = D5, .duration = sixteenth + eigth}, // dotted eigth
-    {.note = REST, .duration = sixteenth},
-    {.note = Db5, .duration = sixteenth},
-    {.note = C5, .duration = sixteenth},
-    {.note = Db5, .duration = sixteenth},
-    {.note = C5, .duration = eigth},
-    {.note = A4, .duration = eigth},
-    {.note = A4, .duration = eigth},
+    {.note = D4, .duration = EIGTH},
+    {.note = D4, .duration = EIGTH},
+    {.note = A4, .duration = EIGTH},
+    {.note = D5, .duration = SIXTEENTH + EIGTH}, // dotted EIGTH
+    {.note = REST, .duration = SIXTEENTH},
+    {.note = Db5, .duration = SIXTEENTH},
+    {.note = C5, .duration = SIXTEENTH},
+    {.note = Db5, .duration = SIXTEENTH},
+    {.note = C5, .duration = EIGTH},
+    {.note = A4, .duration = EIGTH},
+    {.note = A4, .duration = EIGTH},
 };
 
-static struct note_duration funkytown_song[FUNKYTOWN_NOTES] = {
-	{.note = C5, .duration = quarter},
-	{.note = REST, .duration = eigth},
-	{.note = C5, .duration = quarter},
-	{.note = Bb4, .duration = quarter},
-	{.note = C5, .duration = quarter},
-	{.note = REST, .duration = quarter},
-	{.note = G4, .duration = quarter},
-	{.note = REST, .duration = quarter},
-	{.note = G4, .duration = quarter},
-	{.note = C5, .duration = quarter},
-	{.note = F5, .duration = quarter},
-	{.note = E5, .duration = quarter},
-	{.note = C5, .duration = quarter}};
+static Sound funkytown_song[FUNKYTOWN_NOTES] = {
+	{.note = C5, .duration = QUARTER},
+	{.note = REST, .duration = EIGTH},
+	{.note = C5, .duration = QUARTER},
+	{.note = Bb4, .duration = QUARTER},
+	{.note = C5, .duration = QUARTER},
+	{.note = REST, .duration = QUARTER},
+	{.note = G4, .duration = QUARTER},
+	{.note = REST, .duration = QUARTER},
+	{.note = G4, .duration = QUARTER},
+	{.note = C5, .duration = QUARTER},
+	{.note = F5, .duration = QUARTER},
+	{.note = E5, .duration = QUARTER},
+	{.note = C5, .duration = QUARTER}};
 
-static struct note_duration mario_song[MARIO_NOTES] = {
-	{.note = E6, .duration = quarter},
-	{.note = REST, .duration = eigth},
-	{.note = E6, .duration = quarter},
-	{.note = REST, .duration = quarter},
-	{.note = E6, .duration = quarter},
-	{.note = REST, .duration = quarter},
-	{.note = C6, .duration = quarter},
-	{.note = E6, .duration = half},
-	{.note = G6, .duration = half},
-	{.note = REST, .duration = quarter},
-	{.note = G4, .duration = whole},
-	{.note = REST, .duration = whole},
+static Sound mario_song[MARIO_NOTES] = {
+	{.note = E6, .duration = QUARTER},
+	{.note = REST, .duration = EIGTH},
+	{.note = E6, .duration = QUARTER},
+	{.note = REST, .duration = QUARTER},
+	{.note = E6, .duration = QUARTER},
+	{.note = REST, .duration = QUARTER},
+	{.note = C6, .duration = QUARTER},
+	{.note = E6, .duration = HALF},
+	{.note = G6, .duration = HALF},
+	{.note = REST, .duration = QUARTER},
+	{.note = G4, .duration = WHOLE},
+	{.note = REST, .duration = WHOLE},
 	/* break in sound */
-	{.note = C6, .duration = half},
-	{.note = REST, .duration = quarter},
-	{.note = G5, .duration = half},
-	{.note = REST, .duration = quarter},
-	{.note = E5, .duration = half},
-	{.note = REST, .duration = quarter},
-	{.note = A5, .duration = quarter},
-	{.note = REST, .duration = quarter},
-	{.note = B5, .duration = quarter},
-	{.note = REST, .duration = quarter},
-	{.note = Bb5, .duration = quarter},
-	{.note = A5, .duration = half},
-	{.note = G5, .duration = quarter},
-	{.note = E6, .duration = quarter},
-	{.note = G6, .duration = quarter},
-	{.note = A6, .duration = half},
-	{.note = F6, .duration = quarter},
-	{.note = G6, .duration = quarter},
-	{.note = REST, .duration = quarter},
-	{.note = E6, .duration = quarter},
-	{.note = REST, .duration = quarter},
-	{.note = C6, .duration = quarter},
-	{.note = D6, .duration = quarter},
-	{.note = B5, .duration = quarter}};
+	{.note = C6, .duration = HALF},
+	{.note = REST, .duration = QUARTER},
+	{.note = G5, .duration = HALF},
+	{.note = REST, .duration = QUARTER},
+	{.note = E5, .duration = HALF},
+	{.note = REST, .duration = QUARTER},
+	{.note = A5, .duration = QUARTER},
+	{.note = REST, .duration = QUARTER},
+	{.note = B5, .duration = QUARTER},
+	{.note = REST, .duration = QUARTER},
+	{.note = Bb5, .duration = QUARTER},
+	{.note = A5, .duration = HALF},
+	{.note = G5, .duration = QUARTER},
+	{.note = E6, .duration = QUARTER},
+	{.note = G6, .duration = QUARTER},
+	{.note = A6, .duration = HALF},
+	{.note = F6, .duration = QUARTER},
+	{.note = G6, .duration = QUARTER},
+	{.note = REST, .duration = QUARTER},
+	{.note = E6, .duration = QUARTER},
+	{.note = REST, .duration = QUARTER},
+	{.note = C6, .duration = QUARTER},
+	{.note = D6, .duration = QUARTER},
+	{.note = B5, .duration = QUARTER}};
 
-static struct note_duration golioth_song[] = {
-	{.note = C6, .duration = quarter},
-	{.note = REST, .duration = 100},
-	{.note = G5, .duration = 100},
-	{.note = A5, .duration = 100},
-	{.note = Bb5, .duration = 100},
-	{.note = REST, .duration = 100},
-	{.note = Bb5, .duration = 100},
-	{.note = REST, .duration = quarter},
-	{.note = C5, .duration = half},
-	{.note = REST, .duration = half},
-	{.note = REST, .duration = quarter},
-	{.note = C6, .duration = quarter}
-};
+	
 
 /* Thread plays song on buzzer */
 
 K_SEM_DEFINE(buzzer_initialized_sem, 0, 1); /* Wait until buzzer is ready */
-
-#define BUZZER_STACK 1024
-
-void play_chord(const int *notes, int note_count, int duration_ms) {
-	const int swicth_interval_ms = 5;
-	int cycles = duration_ms / swicth_interval_ms;
-
-	for (int i = 0; i < cycles; i++) {
-		int current_note = notes[i % note_count];
-
-		if (current_note == REST || current_note) {
-			pwm_set_pulse_dt(&sBuzzer, 0);
-		} else {
-			pwm_set_dt(&sBuzzer, PWM_HZ(current_note), PWM_HZ(current_note / 2));
-		}
-		k_msleep(swicth_interval_ms);
-	}
-	pwm_set_pulse_dt(&sBuzzer, 0);
-}
 
 extern void buzzer_thread(void *d0, void *d1, void *d2)
 {
@@ -261,138 +210,32 @@ extern void buzzer_thread(void *d0, void *d1, void *d2)
 	while (1) {
 		if (!snake_settings_get_mute()) {
 			switch (song) {
-			case beep:
-				LOG_DBG("beep");
-				pwm_set_dt(&sBuzzer, PWM_HZ(1000), PWM_HZ(1000) / 2);
-				k_msleep(100);
-				break;
-			case funkytown:
-				LOG_DBG("funkytown");
-				for (int i = 0; i < FUNKYTOWN_NOTES; i++) {
-					if (funkytown_song[i].note < 10) {
-						/* Low frequency notes represent a 'pause' */
-						pwm_set_pulse_dt(&sBuzzer, 0);
-						k_msleep(funkytown_song[i].duration);
-					} else {
-						pwm_set_dt(&sBuzzer, PWM_HZ(funkytown_song[i].note),
-								PWM_HZ((funkytown_song[i].note)) / 2);
-						k_msleep(funkytown_song[i].duration);
-					}
-				}
-				break;
-
-			case mario:
-				LOG_DBG("mario");
-				for (int i = 0; i < MARIO_NOTES; i++) {
-					if (mario_song[i].note < 10) {
-						/* Low frequency notes represent a 'pause' */
-						pwm_set_pulse_dt(&sBuzzer, 0);
-						k_msleep(mario_song[i].duration);
-					} else {
-						pwm_set_dt(&sBuzzer, PWM_HZ(mario_song[i].note),
-								PWM_HZ((mario_song[i].note)) / 2);
-						k_msleep(mario_song[i].duration);
-					}
-				}
-				break;
-			case golioth:
-				LOG_DBG("golioth");
-				for (int i = 0; i < (sizeof(golioth_song) / sizeof(golioth_song[1])); i++) {
-					if (golioth_song[i].note < 10) {
-						/* Low frequency notes represent a 'pause' */
-						pwm_set_pulse_dt(&sBuzzer, 0);
-						k_msleep(golioth_song[i].duration);
-					} else {
-						pwm_set_dt(&sBuzzer, PWM_HZ(golioth_song[i].note),
-								PWM_HZ((golioth_song[i].note)) / 2);
-						k_msleep(golioth_song[i].duration);
-					}
-				}
-				break;
-			case megalovania:
-				LOG_DBG("megalovania");
-				for (int i = 0; i < MEGALOVANIA_NOTES; i++) {
-					if (megalovania_song[i].note < 10) {
-						pwm_set_pulse_dt(&sBuzzer, 0);
-						k_msleep(megalovania_song[i].duration);
-					} else {
-						pwm_set_dt(&sBuzzer, PWM_HZ(megalovania_song[i].note),
-								PWM_HZ(megalovania_song[i].note) / 2);
-						k_msleep(megalovania_song[i].duration);
-					}
-				}
-				break;
-			case oneup:
-				LOG_DBG("1up");
-				for (int i = 0; i < ONEUP_NOTES; i++) {
-					if (oneup_song[i].note < 10) {
-						pwm_set_pulse_dt(&sBuzzer, 0);
-						k_msleep(oneup_song[i].duration);
-					} else {
-						pwm_set_dt(&sBuzzer, PWM_HZ(oneup_song[i].note),
-								PWM_HZ(oneup_song[i].note) / 2);
-						k_msleep(oneup_song[i].duration);
-					}
-				}
-				break;
-			case oneup_half:
-				LOG_DBG("1up half");
-				for (int i = 0; i < ONEUP_NOTES; i++) {
-					if (oneup_song[i].note < 10) {
-						pwm_set_pulse_dt(&sBuzzer, 0);
-						k_msleep(oneup_song[i].duration);
-					} else {
-						pwm_set_dt(&sBuzzer, PWM_HZ(oneup_song[i].note),
-								PWM_HZ(oneup_song[i].note) / 20);
-						k_msleep(oneup_song[i].duration);
-					}
-				}
-				break;
-			case coin:
-				LOG_DBG("coin");
-				for (int i = 0; i < COIN_NOTES; i++) {
-					if (coin_song[i].note < 10) {
-						pwm_set_pulse_dt(&sBuzzer, 0);
-						k_msleep(coin_song[i].duration);
-					} else {
-						pwm_set_dt(&sBuzzer, PWM_HZ(coin_song[i].note),
-								PWM_HZ(coin_song[i].note) / 2);
-						k_msleep(coin_song[i].duration);
-					}
-				}
-				break;
-			case reversed_coin:
-				LOG_DBG("reversed coin");
-				for (int i = 0; i < COIN_NOTES; i++) {
-					if (reversed_coin_song[i].note < 10) {
-						pwm_set_pulse_dt(&sBuzzer, 0);
-						k_msleep(reversed_coin_song[i].duration);
-					} else {
-						pwm_set_dt(&sBuzzer, PWM_HZ(reversed_coin_song[i].note),
-								PWM_HZ(reversed_coin_song[i].note) / 2);
-						k_msleep(reversed_coin_song[i].duration);
-					}
-				}
-				break;
-			case coin_polyphonic:
-				LOG_DBG("coin polyphonic");
-				for (int i = 0; i < COIN_CHORDS_NOTES; i++) {
-					play_chord(coin_chords[i].notes, coin_chords[i].note_count, coin_chords[i].duration);
-				}
-				break;
-			default:
-				LOG_WRN("invalid switch state");
-				break;
+			case beep: play_song(beep_song, BEEP_NOTES); break;
+			case funkytown: play_song(funkytown_song, FUNKYTOWN_NOTES); break;
+			case mario: play_song(mario_song, MARIO_NOTES); break;
+			case megalovania: play_song(megalovania_song, MEGALOVANIA_NOTES); break;
+			case oneup: play_song(oneup_song, ONEUP_NOTES); break;
+			case coin: play_song(coin_song, COIN_NOTES); break;
+			case reversed_coin: play_song(reversed_coin_song, COIN_NOTES); break;
+			case crazy_coin: play_song(crazy_coin_song, CRAZY_COIN_NOTES); break;
+			case coin_polyphonic: play_chords(coin_chords, COIN_CHORDS_COUNT); break;
+            case theme_change_song: run_theme_change_song(); break;
+            case connected_song: run_connected_song(); break;
+            case disconnected_song: run_disconnected_song(); break;
+            case error_song: run_error_song(); break;
+            case notification_song: run_notification_song(); break;
+            case startup_song: run_startup_song(); break;
+            case powerd_down_song: run_powerd_down_song(); break;
+			default: break;
 			}
 		}
-
-		/* turn buzzer off (pulse duty to 0) */
-		pwm_set_pulse_dt(&sBuzzer, 0);
 
 		/* Sleep thread until awoken externally */
 		k_sleep(K_FOREVER);
 	}
 }
+
+K_THREAD_DEFINE(buzzer_tid, BUZZER_STACK, buzzer_thread, NULL, NULL, NULL, K_LOWEST_APPLICATION_THREAD_PRIO, 0, 0);
 
 int app_buzzer_init(void)
 {
@@ -403,68 +246,207 @@ int app_buzzer_init(void)
 	return 0;
 }
 
-K_THREAD_DEFINE(buzzer_tid, BUZZER_STACK, buzzer_thread, NULL, NULL, NULL,
-		K_LOWEST_APPLICATION_THREAD_PRIO, 0, 0);
-
-void play_beep_once(void)
-{
-	song = beep;
+void play_once(SongName song_name) {
+	song = song_name;
 	k_wakeup(buzzer_tid);
 }
 
-void play_funkytown_once(void)
-{
-	song = funkytown;
-	k_wakeup(buzzer_tid);
-}
-
-void play_mario_once(void)
-{
-	song = mario;
-	k_wakeup(buzzer_tid);
-}
-
-void play_golioth_once(void)
-{
-	song = golioth;
-	k_wakeup(buzzer_tid);
-}
-
-void play_megalovania_once(void)
-{
-	song = megalovania;
-	k_wakeup(buzzer_tid);
-}
-
-void play_oneup_once(void)
-{
-    song = oneup;
+void play_theme_change_song(void) {
+    song = theme_change_song;
     k_wakeup(buzzer_tid);
 }
 
-void play_oneup_half_once(void)
-{
-    song = oneup_half;
+void play_connected_song(void) {
+    song = connected_song;
     k_wakeup(buzzer_tid);
 }
 
-void play_coin_once(void)
-{
-    song = coin;
+void play_disconnected_song(void) {
+    song = disconnected_song;
     k_wakeup(buzzer_tid);
 }
 
-void play_reversed_coin_once(void)
-{
-    song = reversed_coin;
+void play_error_song(void) {
+    song = error_song;
     k_wakeup(buzzer_tid);
 }
 
-void play_coin_polyphonic_once(void)
-{
-    song = coin_polyphonic;
+void play_notification_song(void) {
+    song = notification_song;
     k_wakeup(buzzer_tid);
 }
+
+void play_startup_song(void) {
+    song = startup_song;
+    k_wakeup(buzzer_tid);
+}
+
+void play_powerd_down_song(void) {
+    song = powerd_down_song;
+    k_wakeup(buzzer_tid);
+}
+
+
+// #####################################################################################
+
+#define THEME_CHANGED_NOTES 3
+static Sound theme_changed_sound[THEME_CHANGED_NOTES] = {
+    {.note = C5, .duration = EIGTH},
+    {.note = E5, .duration = EIGTH},
+    {.note = G5, .duration = QUARTER}
+};
+
+// void play_theme_change_song(void) {
+//     play_slide(theme_changed_sound[0], theme_changed_sound[0], EIGTH + EIGTH);
+//     play_sound(theme_changed_sound[2]);
+    
+//     // Stop the sound after done
+// 	stop_pwm();
+// }
+void run_theme_change_song(void) {
+    if (snake_settings_get_mute()) {
+        return;
+    }
+    play_slide(theme_changed_sound[0].note, theme_changed_sound[1].note, EIGTH + EIGTH);
+    play_sound(theme_changed_sound[2]);
+    
+    // Stop the sound after done
+	stop_pwm();
+}
+
+
+// #####################################################################################
+
+#define CONNECTED_NOTES 2
+static Sound connected_sound[CONNECTED_NOTES] = {
+    {.note = C6, .duration = SIXTEENTH},
+    {.note = E6, .duration = EIGTH}
+};
+
+void run_connected_song(void) {
+    if (snake_settings_get_mute()) {
+        return;
+    }
+    play_dual_note_simulated(connected_sound[0].note, connected_sound[1].note, EIGTH);
+    
+    // Stop the sound after done
+	stop_pwm();
+}
+
+
+// #####################################################################################
+
+#define DISCONNECTED_NOTES 3
+static Sound disconnected_sound[DISCONNECTED_NOTES] = {
+    {.note = E5, .duration = EIGTH},
+    {.note = C5, .duration = EIGTH},
+    {.note = A4, .duration = QUARTER}
+};
+
+void run_disconnected_song(void) {
+    if (snake_settings_get_mute()) {
+        return;
+    }
+    play_sound(disconnected_sound[0]);
+    play_sound(disconnected_sound[1]);
+    play_sound(disconnected_sound[2]);
+    
+    // Stop the sound after done
+	stop_pwm();
+}
+
+
+// #####################################################################################
+
+#define ERROR_NOTES 2
+static Sound error_sound[ERROR_NOTES] = {
+    {.note = C4, .duration = EIGTH},
+    {.note = Gb4, .duration = EIGTH}
+};
+
+void run_error_song(void) {
+    if (snake_settings_get_mute()) {
+        return;
+    }
+    play_dual_note_simulated(error_sound[0].note, error_sound[1].note, EIGTH);
+    
+    // Stop the sound after done
+	stop_pwm();
+}
+
+// #####################################################################################
+
+#define NOTIFICATION_NOTES 1
+static Sound notification_sound[NOTIFICATION_NOTES] = {
+    {.note = G5, .duration = QUARTER}
+};
+
+void run_notification_song(void) {
+    if (snake_settings_get_mute()) {
+        return;
+    }
+    play_sound_with_vibrato(error_sound[0], 6.0f, 5.0f);
+    
+    // Stop the sound after done
+	stop_pwm();
+}
+
+// #####################################################################################
+
+
+#define STARTUP_NOTES 6
+
+static Sound startup_sound[STARTUP_NOTES] = {
+    {.note = C5, .duration = SIXTEENTH},
+    {.note = E5, .duration = SIXTEENTH},
+    {.note = G5, .duration = EIGTH},
+    {.note = REST, .duration = SIXTEENTH},
+    {.note = C6, .duration = QUARTER},   // Bright final tone
+    {.note = REST, .duration = EIGTH}
+};
+
+void run_startup_song(void) {
+    if (snake_settings_get_mute()) {
+        return;
+    }
+    play_slide(C4, C5, EIGTH);
+    play_sound(startup_sound[1]);
+    play_sound(startup_sound[2]);
+    play_sound(startup_sound[3]);
+    play_sound(startup_sound[4]);
+    play_sound(startup_sound[5]);
+    
+    // Stop the sound after done
+	stop_pwm();
+}
+
+// #####################################################################################
+
+#define POWER_DOWN_NOTES 5
+
+static Sound power_down_sound[POWER_DOWN_NOTES] = {
+    {.note = C6, .duration = SIXTEENTH},
+    {.note = G5, .duration = SIXTEENTH},
+    {.note = E5, .duration = SIXTEENTH},
+    {.note = C5, .duration = EIGTH},
+    {.note = A3, .duration = QUARTER}, // soft final low tone
+};
+
+void run_powerd_down_song(void) {
+    if (snake_settings_get_mute()) {
+        return;
+    }
+    play_sound(power_down_sound[0]);
+    play_sound(power_down_sound[1]);
+    play_sound(power_down_sound[2]);
+    play_sound(power_down_sound[3]);
+    play_slide_with_vibrato(C6, A3, HALF, 6.0f, 5.0f);
+    
+    // Stop the sound after done
+	stop_pwm();
+}
+
+// #####################################################################################
 
 #else
 
@@ -473,9 +455,38 @@ int app_buzzer_init(void)
 	return 0;
 }
 
-void play_beep_once(void)
+void play_once(SongName song_name)
 {
 	return;
 }
+
+void play_theme_change_song(void) {
+    return;
+}
+
+void play_connected_song(void) {
+    return;
+}
+
+void play_disconnected_song(void) {
+    return;
+}
+
+void play_error_song(void) {
+    return;
+}
+
+void play_notification_song(void) {
+    return;
+}
+
+void play_startup_song(void) {
+    return;
+}
+
+void play_powerd_down_song(void) {
+    return;
+}
+
 
 #endif

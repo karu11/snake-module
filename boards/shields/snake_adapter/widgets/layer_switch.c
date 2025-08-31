@@ -91,14 +91,14 @@ void print_menu() {
 void toggle_menu() {
     #ifdef CONFIG_USE_BUZZER
         #ifdef CONFIG_USE_MENU_SOUND
-            play_coin_once();
+        play_notification_song();
         #endif
     #endif
     if (menu_on) {
         stop_output_status();
         stop_battery_status();
         stop_animation();
-        restart_snake();
+        start_snake();
         menu_on = false;
     } else {
         stop_snake();
@@ -109,23 +109,18 @@ void toggle_menu() {
 
 void change_theme() {
     set_next_theme();
+    #ifdef CONFIG_USE_BUZZER
+        #ifdef CONFIG_USE_THEME_SOUND
+        play_startup_song();
+        #endif
+    #endif
     if (menu_on) {
         print_menu();
         apply_theme_snake();
-        #ifdef CONFIG_USE_BUZZER
-            #ifdef CONFIG_USE_THEME_SOUND
-            play_oneup_once();
-            #endif
-        #endif
     } else {
         stop_snake();
         apply_theme_snake();
-        restart_snake();
-        #ifdef CONFIG_USE_BUZZER
-            #ifdef CONFIG_USE_THEME_SOUND
-                play_oneup_half_once();
-            #endif
-        #endif
+        start_snake();
     }
 }
 
@@ -144,7 +139,7 @@ void set_layer_symbol() {
         #ifdef CONFIG_USE_BUZZER
         snake_settings_toggle_mute();
         if (!snake_settings_get_mute()) {
-            play_coin_once();
+            play_once(coin);
         }
         #endif
     }

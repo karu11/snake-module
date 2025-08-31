@@ -4,17 +4,32 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-int app_buzzer_init(void);
-void play_beep_once(void);
+typedef enum {
+	beep,
+	funkytown,
+	mario,
+	megalovania,
+	oneup,
+	coin,
+	reversed_coin,
+	coin_polyphonic,
+	crazy_coin,
+	theme_change_song,
+	connected_song,
+	disconnected_song,
+	error_song,
+	notification_song,
+	startup_song,
+	powerd_down_song,
+} SongName;
 
-#if CONFIG_USE_BUZZER
-void play_funkytown_once(void);
-void play_mario_once(void);
-void play_golioth_once(void);
-void play_megalovania_once(void);
-void play_oneup_once(void);
-void play_oneup_half_once(void);
-void play_coin_once(void);
-void play_reversed_coin_once(void);
-void play_coin_polyphonic_once(void);
-#endif
+int app_buzzer_init(void);
+void play_once(SongName song_name);
+
+void play_theme_change_song(void);
+void play_connected_song(void);
+void play_disconnected_song(void);
+void play_error_song(void);
+void play_notification_song(void);
+void play_startup_song(void);
+void play_powerd_down_song(void);

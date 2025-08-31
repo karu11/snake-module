@@ -33,6 +33,9 @@ static uint16_t snake_color_4;
 static uint16_t snake_color_5;
 static uint16_t snake_color_6;
 
+static uint16_t battery_num_color_1;
+static uint16_t battery_percentage_color_1;
+static uint16_t battery_bg_color_1;
 static uint16_t battery_num_color;
 static uint16_t battery_percentage_color;
 static uint16_t battery_bg_color;
@@ -42,9 +45,14 @@ static uint16_t symbol_unselected_color;
 static uint16_t symbol_bg_color;
 static uint16_t bt_num_color;
 static uint16_t bt_bg_color;
+static uint16_t bt_status_ok_color;
+static uint16_t bt_status_not_ok_color;
+static uint16_t bt_status_open_color;
+static uint16_t bt_status_bg_color;
 
 static uint16_t theme_bg_color;
 static uint16_t theme_font_color;
+static uint16_t theme_font_color_1;
 
 static uint16_t logo_bg_color;
 static uint16_t logo_font_color;
@@ -52,6 +60,7 @@ static uint16_t logo_snake_color;
 
 static uint16_t frame_color;
 static uint16_t frame_color_1;
+static uint16_t menu_bg_color;
 
 static DefaultScreen default_screen = SNAKE_SCREEN;
 
@@ -90,18 +99,27 @@ void set_complete_colors_theme() {
     uint32_t battery_num_color = hex_string_to_uint(CONFIG_BATTERY_NUM_COLOR);
     uint32_t battery_percentage_color = hex_string_to_uint(CONFIG_BATTERY_PERCENTAGE_COLOR);
     uint32_t battery_bg_color = hex_string_to_uint(CONFIG_BATTERY_BG_COLOR);
+    uint32_t battery_num_color_1 = hex_string_to_uint(CONFIG_BATTERY_NUM_COLOR_1);
+    uint32_t battery_percentage_color_1 = hex_string_to_uint(CONFIG_BATTERY_PERCENTAGE_COLOR_1);
+    uint32_t battery_bg_color_1 = hex_string_to_uint(CONFIG_BATTERY_BG_COLOR_1);
     uint32_t symbol_selected_color = hex_string_to_uint(CONFIG_SYMBOL_SELECTED_COLOR);
     uint32_t symbol_unselected_color = hex_string_to_uint(CONFIG_SYMBOL_UNSELECTED_COLOR);
     uint32_t symbol_bg_color = hex_string_to_uint(CONFIG_SYMBOL_BG_COLOR);
     uint32_t bt_num_color = hex_string_to_uint(CONFIG_BT_NUM_COLOR);
     uint32_t bt_bg_color = hex_string_to_uint(CONFIG_BT_BG_COLOR);
+    uint32_t bt_status_ok_color = hex_string_to_uint(CONFIG_BT_STATUS_OK_COLOR);
+    uint32_t bt_status_not_ok_color = hex_string_to_uint(CONFIG_BT_STATUS_NOT_OK_COLOR);
+    uint32_t bt_status_open_color = hex_string_to_uint(CONFIG_BT_STATUS_OPEN_COLOR);
+    uint32_t bt_status_bg_color = hex_string_to_uint(CONFIG_BT_STATUS_BG_COLOR);
     uint32_t theme_font_color = hex_string_to_uint(CONFIG_THEME_FONT_COLOR);
+    uint32_t theme_font_color_1 = hex_string_to_uint(CONFIG_THEME_FONT_COLOR_1);
     uint32_t theme_bg_color = hex_string_to_uint(CONFIG_THEME_BG_COLOR);
     uint32_t logo_font_color = hex_string_to_uint(CONFIG_LOGO_FONT_COLOR);
     uint32_t logo_snake_color = hex_string_to_uint(CONFIG_LOGO_SNAKE_COLOR);
     uint32_t logo_bg_color = hex_string_to_uint(CONFIG_LOGO_BG_COLOR);
     uint32_t frame_color = hex_string_to_uint(CONFIG_FRAME_COLOR);
     uint32_t frame_color_1 = hex_string_to_uint(CONFIG_FRAME_COLOR_1);
+    uint32_t menu_bg_color = hex_string_to_uint(CONFIG_MENU_BG_COLOR);
 
     if (splash_logo_color == HEX_PARSE_ERROR) {
         splash_logo_color = 0xFFFFFF;
@@ -171,6 +189,18 @@ void set_complete_colors_theme() {
         battery_bg_color = 0xFFFFFF;
     }
 
+    if (battery_num_color_1 == HEX_PARSE_ERROR) {
+        battery_num_color_1 = 0xFFFFFF;
+    }
+
+    if (battery_percentage_color_1 == HEX_PARSE_ERROR) {
+        battery_percentage_color_1 = 0xFFFFFF;
+    }
+
+    if (battery_bg_color_1 == HEX_PARSE_ERROR) {
+        battery_bg_color_1 = 0xFFFFFF;
+    }
+
     if (symbol_selected_color == HEX_PARSE_ERROR) {
         symbol_selected_color = 0xFFFFFF;
     }
@@ -191,8 +221,30 @@ void set_complete_colors_theme() {
         bt_bg_color = 0xFFFFFF;
     }
 
+    if (bt_status_ok_color == HEX_PARSE_ERROR) {
+        bt_status_ok_color = 0xFFFFFF;
+    }
+
+
+    if (bt_status_not_ok_color == HEX_PARSE_ERROR) {
+        bt_status_not_ok_color = 0xFFFFFF;
+    }
+
+
+    if (bt_status_open_color == HEX_PARSE_ERROR) {
+        bt_status_open_color = 0xFFFFFF;
+    }
+
+    if (bt_status_bg_color == HEX_PARSE_ERROR) {
+        bt_status_bg_color = 0xFFFFFF;
+    }
+
     if (theme_font_color == HEX_PARSE_ERROR) {
         theme_font_color = 0xFFFFFF;
+    }
+
+    if (theme_font_color_1 == HEX_PARSE_ERROR) {
+        theme_font_color_1 = 0xFFFFFF;
     }
 
     if (theme_bg_color == HEX_PARSE_ERROR) {
@@ -218,6 +270,10 @@ void set_complete_colors_theme() {
     if (frame_color_1 == HEX_PARSE_ERROR) {
         frame_color_1 = 0xFFFFFF;
     }
+    
+    if (menu_bg_color == HEX_PARSE_ERROR) {
+        menu_bg_color = 0xFFFFFF;
+    }
 
     set_all_colors(
         splash_logo_color,
@@ -237,18 +293,28 @@ void set_complete_colors_theme() {
         battery_num_color,
         battery_percentage_color,
         battery_bg_color,
+        battery_num_color_1,
+        battery_percentage_color_1,
+        battery_bg_color_1,
         symbol_selected_color,
         symbol_unselected_color,
         symbol_bg_color,
         bt_num_color,
         bt_bg_color,
+        bt_status_ok_color,
+        bt_status_not_ok_color,
+        bt_status_open_color,
+        bt_status_bg_color,
         theme_font_color,
+        theme_font_color_1,
         theme_bg_color,
         logo_font_color,
         logo_snake_color,
         logo_bg_color,
         frame_color,
-        frame_color_1);
+        frame_color_1,
+        menu_bg_color
+    );
 }
 
 static const uint16_t empty_bitmap_5x7[] = {
@@ -1079,12 +1145,28 @@ void set_battery_bg_color(uint32_t color) {
     battery_bg_color = rgb888_to_rgb565(color);
 }
 
+void set_battery_num_color_1(uint32_t color) {
+    battery_num_color_1 = rgb888_to_rgb565(color);
+}
+
+void set_battery_percentage_color_1(uint32_t color) {
+    battery_percentage_color_1 = rgb888_to_rgb565(color);
+}
+
+void set_battery_bg_color_1(uint32_t color) {
+    battery_bg_color_1 = rgb888_to_rgb565(color);
+}
+
 void set_frame_color(uint32_t color) {
     frame_color = rgb888_to_rgb565(color);
 }
 
 void set_frame_color_1(uint32_t color) {
     frame_color_1 = rgb888_to_rgb565(color);
+}
+
+void set_menu_bg_color(uint32_t color) {
+    menu_bg_color = rgb888_to_rgb565(color);
 }
 
 void set_symbol_selected_color(uint32_t color) {
@@ -1119,8 +1201,28 @@ void set_theme_font_color(uint32_t color) {
     theme_font_color = rgb888_to_rgb565(color);
 }
 
+void set_theme_font_color_1(uint32_t color) {
+    theme_font_color_1 = rgb888_to_rgb565(color);
+}
+
 void set_bt_num_color(uint32_t color) {
     bt_num_color = rgb888_to_rgb565(color);
+}
+
+void set_bt_status_ok_color(uint32_t color) {
+    bt_status_ok_color = rgb888_to_rgb565(color);
+}
+
+void set_bt_status_not_ok_color(uint32_t color) {
+    bt_status_not_ok_color = rgb888_to_rgb565(color);
+}
+
+void set_bt_status_open_color(uint32_t color) {
+    bt_status_open_color = rgb888_to_rgb565(color);
+}
+
+void set_bt_status_bg_color(uint32_t color) {
+    bt_status_bg_color = rgb888_to_rgb565(color);
 }
 
 void set_bt_bg_color(uint32_t color) {
@@ -1211,6 +1313,18 @@ uint16_t get_battery_bg_color() {
     return battery_bg_color;
 }
 
+uint16_t get_battery_num_color_1() {
+    return battery_num_color_1;
+}
+
+uint16_t get_battery_percentage_color_1() {
+    return battery_percentage_color_1;
+}
+
+uint16_t get_battery_bg_color_1() {
+    return battery_bg_color_1;
+}
+
 uint16_t get_symbol_selected_color() {
     return symbol_selected_color;
 }
@@ -1225,6 +1339,10 @@ uint16_t get_theme_bg_color() {
 
 uint16_t get_theme_font_color() {
     return theme_font_color;
+}
+
+uint16_t get_theme_font_color_1() {
+    return theme_font_color_1;
 }
 
 uint16_t get_logo_bg_color() {
@@ -1247,6 +1365,22 @@ uint16_t get_bt_num_color() {
     return bt_num_color;
 }
 
+uint16_t get_bt_status_ok_color() {
+    return bt_status_ok_color;
+}
+
+uint16_t get_bt_status_not_ok_color() {
+    return bt_status_not_ok_color;
+}
+
+uint16_t get_bt_status_open_color() {
+    return bt_status_open_color;
+}
+
+uint16_t get_bt_status_bg_color() {
+    return bt_status_bg_color;
+}
+
 uint16_t get_bt_bg_color() {
     return bt_bg_color;
 }
@@ -1257,6 +1391,10 @@ uint16_t get_frame_color() {
 
 uint16_t get_frame_color_1() {
     return frame_color_1;
+}
+
+uint16_t get_menu_bg_color() {
+    return menu_bg_color;
 }
 
 // Clamp function to ensure values stay within 0-255
@@ -1300,8 +1438,6 @@ void init_display(void) {
     screen_height = 20;
     buf_screen_size = screen_width * screen_height * 2u;
 	buf_screen_area = k_malloc(buf_screen_size);
-    
-	//fill_buffer_color(buf_screen_area, buf_screen_size, get_splash_bg_color());
 }
 
 uint32_t hex_string_to_uint(const char *hex_str) {
@@ -1532,6 +1668,7 @@ void render_filled_rectangle(uint8_t *buf_area, uint8_t x, uint8_t y, uint8_t wi
 }
 
 void clear_screen() {
+	fill_buffer_color(buf_screen_area, buf_screen_size, get_menu_bg_color());
     for (int i = 0; i < 12; i++) {
         for (int j = 0; j < 12; j++) {
             render_filled_rectangle(buf_screen_area, i * screen_width, j * screen_height, screen_width, screen_height);
@@ -1557,18 +1694,27 @@ void set_all_colors(
     uint32_t battery_num_color,
     uint32_t battery_percentage_color,
     uint32_t battery_bg_color,
+    uint32_t battery_num_color_1,
+    uint32_t battery_percentage_color_1,
+    uint32_t battery_bg_color_1,
     uint32_t symbol_selected_color,
     uint32_t symbol_unselected_color,
     uint32_t symbol_bg_color,
     uint32_t bt_num_color,
     uint32_t bt_bg_color,
+    uint32_t bt_status_ok_color,
+    uint32_t bt_status_not_ok_color,
+    uint32_t bt_status_open_color,
+    uint32_t bt_status_bg_color,
     uint32_t theme_font_color,
+    uint32_t theme_font_color_1,
     uint32_t theme_bg_color,
     uint32_t logo_font_color,
     uint32_t logo_snake_color,
     uint32_t logo_bg_color,
     uint32_t frame_color,
-    uint32_t frame_color_1
+    uint32_t frame_color_1,
+    uint32_t menu_bg_color
 ) {
     set_splash_logo_color(splash_logo_color);
     set_splash_created_by_color(splash_created_by_color);
@@ -1590,14 +1736,22 @@ void set_all_colors(
     set_battery_num_color(battery_num_color);
     set_battery_percentage_color(battery_percentage_color);
     set_battery_bg_color(battery_bg_color);
+    set_battery_num_color_1(battery_num_color_1);
+    set_battery_percentage_color_1(battery_percentage_color_1);
+    set_battery_bg_color_1(battery_bg_color_1);
 
     set_symbol_selected_color(symbol_selected_color);
     set_symbol_unselected_color(symbol_unselected_color);
     set_symbol_bg_color(symbol_bg_color);
     set_bt_num_color(bt_num_color);
     set_bt_bg_color(bt_bg_color);
+    set_bt_status_ok_color(bt_status_ok_color);
+    set_bt_status_not_ok_color(bt_status_not_ok_color);
+    set_bt_status_open_color(bt_status_open_color);
+    set_bt_status_bg_color(bt_status_bg_color);
 
     set_theme_font_color(theme_font_color);
+    set_theme_font_color_1(theme_font_color_1);
     set_theme_bg_color(theme_bg_color);
 
     set_logo_font_color(logo_font_color);
@@ -1606,6 +1760,7 @@ void set_all_colors(
 
     set_frame_color(frame_color);
     set_frame_color_1(frame_color_1);
+    set_menu_bg_color(menu_bg_color);
 }
 
 void set_colorscheme(uint32_t primary, uint32_t secondary, uint32_t background1, uint32_t background2, uint32_t color5, uint32_t color6) {
@@ -1633,14 +1788,22 @@ void set_colorscheme(uint32_t primary, uint32_t secondary, uint32_t background1,
     set_battery_num_color(primary);
     set_battery_percentage_color(background1);
     set_battery_bg_color(background2);
+    set_battery_num_color_1(primary);
+    set_battery_percentage_color_1(background1);
+    set_battery_bg_color_1(background2);
 
     set_symbol_selected_color(primary);
     set_symbol_unselected_color(background1);
     set_symbol_bg_color(background2);
     set_bt_num_color(secondary);
     set_bt_bg_color(background2);
+    set_bt_status_ok_color(background1);
+    set_bt_status_not_ok_color(background1);
+    set_bt_status_open_color(background1);
+    set_bt_status_bg_color(background2);
 
     set_theme_font_color(primary);
+    set_theme_font_color_1(primary);
     set_theme_bg_color(background2);
 
     set_logo_font_color(primary);
@@ -1649,8 +1812,7 @@ void set_colorscheme(uint32_t primary, uint32_t secondary, uint32_t background1,
 
     set_frame_color(background1);
     set_frame_color_1(darken_color(background1, 0.1));
-
-    fill_buffer_color(buf_screen_area, buf_screen_size, get_splash_bg_color());
+    set_menu_bg_color(background2);
 }
 
 void print_string(uint16_t *scaled_bitmap, Character str[], uint16_t x, uint16_t y, uint16_t scale, uint16_t color, uint16_t bg_color, FontSize font_size, uint16_t gap_pixels, uint8_t strLen) {

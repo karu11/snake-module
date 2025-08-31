@@ -48,7 +48,7 @@ static const uint16_t bluetooth_status_x = 84;
 static const uint16_t bluetooth_status_y = 123;
 static const uint16_t symbol_usb_x = 12;
 static const uint16_t symbol_ble_x = 36;
-static const uint16_t symbols_y = 121;
+static const uint16_t symbols_y = 122;
 
 static const uint16_t usb_ready_bitmap[] = {
     0, 1, 1, 1, 1, 1, 1, 1, 0,
@@ -209,12 +209,12 @@ static struct output_status_state get_state(const zmk_event_t *_eh) {
 void print_bluetooth_status(uint16_t x, uint16_t y, struct output_status_state state) {
     if (state.active_profile_bonded) {
         if (state.active_profile_connected) {
-            print_bitmap_status(scaled_bitmap_status, STATUS_OK, x, y, status_scale, get_bt_num_color(), get_bt_bg_color());
+            print_bitmap_status(scaled_bitmap_status, STATUS_OK, x, y, status_scale, get_bt_status_ok_color(), get_bt_status_bg_color());
         } else {
-            print_bitmap_status(scaled_bitmap_status, STATUS_NOT_OK, x, y, status_scale, get_bt_num_color(), get_bt_bg_color());
+            print_bitmap_status(scaled_bitmap_status, STATUS_NOT_OK, x, y, status_scale, get_bt_status_not_ok_color(), get_bt_status_bg_color());
         }
     } else {
-        print_bitmap_status(scaled_bitmap_status, STATUS_OPEN, x, y, status_scale, get_bt_num_color(), get_bt_bg_color());
+        print_bitmap_status(scaled_bitmap_status, STATUS_OPEN, x, y, status_scale, get_bt_status_open_color(), get_bt_status_bg_color());
     }
 }
 

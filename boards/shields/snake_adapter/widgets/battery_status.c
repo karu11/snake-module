@@ -84,25 +84,25 @@ void print_percentage(uint8_t digit, uint16_t x, uint16_t y, uint16_t scale, uin
 
 void set_battery_symbol() {
     print_percentage(battery_state_0.level, start_x_peripheral_1, start_y, scale, get_battery_num_color(), get_battery_bg_color(), get_battery_percentage_color());
-    print_percentage(battery_state_1.level, start_x_peripheral_2, start_y, scale, get_battery_num_color(), get_battery_bg_color(), get_battery_percentage_color());
+    print_percentage(battery_state_1.level, start_x_peripheral_2, start_y, scale, get_battery_num_color_1(), get_battery_bg_color_1(), get_battery_percentage_color_1());
 }
 
 #ifdef CONFIG_USE_BUZZER
 void alarm_peripheral_changed_status(struct peripheral_battery_state state) {
     if (state.source == 0) {
         if (previous_battery_level_0 == 0 && state.level != 0) {
-            play_coin_once();
+            play_disconnected_song();
         }
         if (previous_battery_level_0 != 0 && state.level == 0) {
-            play_reversed_coin_once();
+            play_error_song();
         }
         previous_battery_level_0 = state.level;
     } else {
         if (previous_battery_level_1 == 0 && state.level != 0) {
-            play_coin_once();
+            play_disconnected_song();
         }
         if (previous_battery_level_1 != 0 && state.level == 0) {
-            play_reversed_coin_once();
+            play_error_song();
         }
         previous_battery_level_1 = state.level;
     }
@@ -117,7 +117,9 @@ void battery_status_update_cb(struct peripheral_battery_state state) {
     }
     if (battery_widget_initialized) {
         #ifdef CONFIG_USE_BUZZER
-        alarm_peripheral_changed_status(state);
+            #ifdef CONFIG_USE_STATUS_SOUND
+            alarm_peripheral_changed_status(state);
+            #endif
         #endif
     }
     if (battery_widget_running) {
@@ -140,7 +142,7 @@ ZMK_SUBSCRIPTION(widget_battery_status, zmk_peripheral_battery_state_changed);
 
 void print_empty_batteries() {
     print_percentage(0, start_x_peripheral_1, start_y, scale, get_battery_num_color(), get_battery_bg_color(), get_battery_percentage_color());
-    print_percentage(0, start_x_peripheral_2, start_y, scale, get_battery_num_color(), get_battery_bg_color(), get_battery_percentage_color());
+    print_percentage(0, start_x_peripheral_2, start_y, scale, get_battery_num_color_1(), get_battery_bg_color_1(), get_battery_percentage_color_1());
 }
 
 void zmk_widget_peripheral_battery_status_init() {
