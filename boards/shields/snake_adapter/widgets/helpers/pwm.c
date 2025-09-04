@@ -20,14 +20,6 @@ void stop_pwm() {
 }
 
 void play_song(Sound sounds[], int notes_count) {
-    // for (int i = 0; i < notes_count; i++) {
-    //     if (i == 0) {
-    //         //play_slide(C4, C5, WHOLE);
-    //         play_dual_note_simulated(C4, C5, WHOLE);
-    //     } else {
-    //         play_sound_with_vibrato(sounds[i], 10.0f, 5.0f);
-    //     }
-    // }
     for (int i = 0; i < notes_count; i++) {
         play_sound(sounds[i]);
     }
@@ -37,103 +29,6 @@ void play_song(Sound sounds[], int notes_count) {
 }
 
 /*
-
-#define SUCCESS_NOTES 2
-static Sound success_sound[SUCCESS_NOTES] = {
-    {.note = E5, .duration = SIXTEENTH},
-    {.note = C5, .duration = EIGTH}
-};
-//Optional: Use play_dual_note_simulated(C5, E5, EIGTH) for a harmonic "ding."
-
-#define CANCEL_NOTES 2
-static Sound cancel_sound[CANCEL_NOTES] = {
-    {.note = Bb4, .duration = SIXTEENTH},
-    {.note = G4, .duration = EIGTH}
-};
-
-#define CHARGING_NOTES 4
-static Sound charging_sound[CHARGING_NOTES] = {
-    {.note = A4, .duration = SIXTEENTH},
-    {.note = C5, .duration = SIXTEENTH},
-    {.note = E5, .duration = EIGTH},
-    {.note = G5, .duration = QUARTER}
-};
-// Can also be played with slight play_slide_with_vibrato transitions between steps.
-
-#define BATTERY_FULL_NOTES 5
-static Sound battery_full_sound[BATTERY_FULL_NOTES] = {
-    {.note = G4, .duration = SIXTEENTH},
-    {.note = C5, .duration = SIXTEENTH},
-    {.note = E5, .duration = SIXTEENTH},
-    {.note = G5, .duration = SIXTEENTH},
-    {.note = C6, .duration = QUARTER}
-};
-
-#define WARNING_NOTES 2
-static Sound warning_sound[WARNING_NOTES] = {
-    {.note = F4, .duration = EIGTH},
-    {.note = A4, .duration = QUARTER}
-};
-
-#define CRITICAL_ERROR_NOTES 4
-static Sound critical_error_sound[CRITICAL_ERROR_NOTES] = {
-    {.note = C5, .duration = SIXTEENTH},
-    {.note = Gb4, .duration = SIXTEENTH},
-    {.note = E4, .duration = EIGTH},
-    {.note = C3, .duration = HALF}
-};
-// Could also be: play_slide_with_vibrato(C5, C3, WHOLE, 12.0f, 4.0f);
-
-#define WIFI_SEARCH_NOTES 3
-static Sound wifi_search_sound[WIFI_SEARCH_NOTES] = {
-    {.note = G4, .duration = SIXTEENTH},
-    {.note = A4, .duration = SIXTEENTH},
-    {.note = Bb4, .duration = SIXTEENTH}
-};
-//Play this in a loop while searching, optionally increasing pitch subtly on each loop.
-
-#define WIFI_CONNECTED_NOTES 3
-static Sound wifi_connected_sound[WIFI_CONNECTED_NOTES] = {
-    {.note = D5, .duration = SIXTEENTH},
-    {.note = F5, .duration = SIXTEENTH},
-    {.note = A5, .duration = EIGTH}
-};
-
-#define LOW_BATTERY_NOTES 3
-static Sound low_battery_sound[LOW_BATTERY_NOTES] = {
-    {.note = C4, .duration = SIXTEENTH},
-    {.note = REST, .duration = SIXTEENTH},
-    {.note = C4, .duration = QUARTER}
-};
-// Could add a vibrato here to make it "shaky" like a dying battery :play_sound_with_vibrato((Sound){.note = C4, .duration = QUARTER}, 12.0f, 4.0f);
-
-
-// #####################################################################################
-
-typedef enum {
-    SOUND_THEME_CHANGED,
-    SOUND_CONNECTED,
-    SOUND_DISCONNECTED,
-    SOUND_STARTUP,
-    SOUND_SHUTDOWN,
-    SOUND_SUCCESS,
-    SOUND_CANCEL,
-    SOUND_CHARGING,
-    SOUND_BATTERY_FULL,
-    SOUND_WARNING,
-    SOUND_CRITICAL_ERROR,
-    SOUND_WIFI_SEARCH,
-    SOUND_WIFI_CONNECTED,
-    SOUND_LOW_BATTERY,
-    SOUND_NOTIFICATION
-} SoundType;
-
- case SOUND_SUCCESS:
-    play_song(success_sound, SUCCESS_NOTES);
-    break;
-
-    
-// #####################################################################################
 SOUND MODULATION TECHNIQUES
 1. Tremolo (Volume Modulation)
 
@@ -144,6 +39,7 @@ Effect: A "pulsing" or stuttering sound — useful for alerts or warnings.
 Implementation Idea:
 
 Simulate by toggling between pwm_set_dt() and pwm_set_pulse_dt(0) at fast intervals.
+*/
 void play_tremolo(int freq, int duration_ms, float rate_hz) {
     uint32_t elapsed_ms = 0;
     uint32_t step_ms = 10;
@@ -166,6 +62,7 @@ void play_tremolo(int freq, int duration_ms, float rate_hz) {
     stop_pwm();
 }
 
+/*
 2. Pitch Drop / Falloff
 
 Definition: A nonlinear (usually exponential) pitch drop — like "dying robot" or retro UI.
@@ -175,10 +72,9 @@ Usage: Power-down sounds, failure tones.
 play_slide_exponential(C6, A3, HALF); // already implemented!
 
 play_slide_with_vibrato(C6, A2, WHOLE, 20.0f, 5.0f);
+*/
 
-
-
-
+/*
 3. Trill (Rapid Alternating Between Two Notes)
 
 Definition: Alternates between two close notes rapidly.
@@ -186,6 +82,7 @@ Definition: Alternates between two close notes rapidly.
 Effect: Expressive or attention-catching. Very musical.
 
 Usage: Notifications, playful UI actions.
+*/
 void play_trill(int note1, int note2, int duration_ms, int rate_hz) {
     uint32_t elapsed_ms = 0;
     uint32_t switch_interval_ms = 1000 / (rate_hz * 2);
@@ -202,13 +99,13 @@ void play_trill(int note1, int note2, int duration_ms, int rate_hz) {
 
     stop_pwm();
 }
-
+/*
 4. Glissando (Smooth Continuous Slide Through Notes)
 
 Definition: Continuous sweep through a series of notes, not just start → end.
 
 Usage: Menu scroll, drag actions, startup tones.
-
+*/
 void play_glissando(int start_note, int end_note, int duration_ms) {
     int steps = abs(end_note - start_note);
     if (steps == 0) return;
@@ -224,11 +121,13 @@ void play_glissando(int start_note, int end_note, int duration_ms) {
     stop_pwm();
 }
 
+/*
 6. Bit-Crushed / Retro Effect
 
 Definition: Make it sound like old-school 8-bit tones
 
 Implementation: Intentionally step through frequencies in jagged intervals or use square wave burst patterns.
+*/
 void play_bitcrushed_ramp(int start_note, int end_note, int duration_ms) {
     int steps = 8;
     int step_duration = duration_ms / steps;
@@ -242,6 +141,7 @@ void play_bitcrushed_ramp(int start_note, int end_note, int duration_ms) {
     stop_pwm();
 }
 
+/*
 7. Cold Boot Effect (Rising+Glitch)
 
 Start with a slow vibrato ramp and end with a bright tone.
@@ -260,8 +160,6 @@ Technique Combinations
 
 */
 
-
-// #####################################################################################
 void play_sound(Sound sound) {
     if (sound.note < 10) {
         /* Low frequency notes represent a 'pause' */
