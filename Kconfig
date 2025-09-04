@@ -2,6 +2,18 @@ config DEFAULT_SCREEN
     string "Default screen"
     default "snake"
 
+config DISPLAY_BRIGHTNESS
+    int "Display brightness"
+    default 100
+
+config MUTE_THRESHOLD
+    int "Mute threshold"
+    default 600
+
+config THEME_THRESHOLD
+    int "Theme threshold"
+    default 300
+
 config THEME_COLOR_1
     string "Color 1"
     default "4aedff"

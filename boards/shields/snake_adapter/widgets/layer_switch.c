@@ -33,10 +33,12 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include "theme.h"
 //#include "snake_image.h"
 #include "logo.h"
+#include <stdint.h>
 
 static uint8_t *buf_frame;
-static uint16_t tapping_term_ms_theme = 300;
-static uint16_t tapping_term_ms_mute = 900;
+static uint16_t menu_threshold = 0;
+static uint16_t theme_threshold = 300;
+static uint16_t mute_threshold = 600;
 static int64_t pressed_timestamp = 0;
 static int64_t released_timestamp = 0;
 
@@ -55,6 +57,14 @@ struct layer_status_state {
     uint8_t index;
     const char *label;
 };
+
+void set_theme_threshold(uint16_t term_ms) {
+    theme_threshold = term_ms;
+}
+
+void set_mute_threshold(uint16_t term_ms) {
+    mute_threshold = term_ms;
+}
 
 void print_container(uint8_t *buf_frame, uint16_t start_x, uint16_t end_x, uint16_t start_y, uint16_t end_y, uint16_t scale) {
     print_rectangle(buf_frame, start_x, end_x - scale, start_y, end_y - scale, get_frame_color(), scale);
@@ -146,6 +156,40 @@ void set_layer_symbol() {
     dongle_lock = false;
 }
 
+// uint16_t compare_integers(const void *a, const void *b) {
+//     return (*(uint16_t *)a - *(uint16_t *)b);
+// }
+
+// uint16_t find_closest_below_elapsed(const uint16_t *array, size_t size, int64_t elapsed_time) {
+//     qsort(array, size, sizeof(uint16_t), compare_integers);
+
+//     for (uint8_t i = 0; i < size; i++) {
+//         if (elapsed_time < array[i]) {
+//             if (i == 0) {
+//                 return array[0];
+//             }
+//             return array[i - 1];
+//         }
+//     }
+//     return array[size-1];
+// }
+
+
+// uint8_t get_action(int64_t elapsed_time) {
+//     uint16_t thresholds[] = {menu_threshold, theme_threshold, mute_threshold};
+//     uint16_t threshold = find_closest_below_elapsed(thresholds, 3, elapsed_time);
+//     if (threshold == menu_threshold) {
+//         return menu_layer;
+//     }
+//     if (threshold == theme_threshold) {
+//         return theme_layer;
+//     }
+//     if (threshold == mute_threshold) {
+//         return mute_layer;
+//     }
+//     return menu_layer;
+// }
+
 void dongle_action_update_cb(struct zmk_dongle_actioned state) {
     if (state.timestamp == 0) {
         return;
@@ -157,11 +201,13 @@ void dongle_action_update_cb(struct zmk_dongle_actioned state) {
     if (!state.pressed) {
         uint8_t index;
         int64_t elapsed_time = state.timestamp - pressed_timestamp;
-        if (elapsed_time < tapping_term_ms_theme) {
+        if (elapsed_time > menu_threshold) {
             index = menu_layer;
-        } else if (elapsed_time < tapping_term_ms_mute) {
+        }
+        if (elapsed_time > theme_threshold) {
             index = theme_layer;
-        } else {
+        }
+        if (elapsed_time > mute_threshold) {
             index = mute_layer;
         }
         ls_state = (struct layer_status_state) {

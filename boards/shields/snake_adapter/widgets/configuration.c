@@ -1,5 +1,15 @@
+#include <zephyr/logging/log.h>
+LOG_MODULE_REGISTER(app_configuration, LOG_LEVEL_DBG);
+
 #include <stdlib.h>
 #include "helpers/display.h"
+#include "layer_switch.h"
+
+#include <zephyr/device.h>
+#include <zephyr/drivers/pwm.h>
+#include <zephyr/kernel.h>
+
+static const struct pwm_dt_spec pwm_backlight = PWM_DT_SPEC_GET(DT_CHOSEN(zephyr_backlight));
 
 void board_size() {
     const char *size_str = CONFIG_SNAKE_BOARD_SIZE;
@@ -68,10 +78,37 @@ void custom_theme() {
     }
 }
 
+void set_display_brightness() {
+    uint8_t level;
+    if (CONFIG_DISPLAY_BRIGHTNESS < 0 || CONFIG_DISPLAY_BRIGHTNESS > 100) {
+        level = 100;
+    } else {
+        level = CONFIG_DISPLAY_BRIGHTNESS;
+    }
+    uint32_t period = 1000;
+    uint32_t duty_cycle = (period * level) / 100;
+    pwm_set_dt(&pwm_backlight, PWM_HZ(period), PWM_HZ(duty_cycle));
+}
+
+void action_button() {
+    set_theme_threshold(300);
+    set_mute_threshold(600);
+    if (CONFIG_THEME_THRESHOLD <= 0) {
+        return;
+    }
+    if (CONFIG_THEME_THRESHOLD >= CONFIG_MUTE_THRESHOLD) {
+        return;
+    }
+    set_theme_threshold(CONFIG_THEME_THRESHOLD);
+    set_mute_threshold(CONFIG_MUTE_THRESHOLD);
+}
+
 void configure(void) {
+    set_display_brightness();
     if (!CONFIG_USE_COMPLETE_CUSTOM_THEME) {
         custom_theme();
     }
     board_size();
     default_screen();
+    action_button();
 }

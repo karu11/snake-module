@@ -570,7 +570,7 @@ static void render_snake(void) {
     if (walk_index >= draw_index) {
         #ifdef CONFIG_USE_BUZZER
             #ifdef CONFIG_USE_FOOD_SOUND
-                play_connected_song();
+                play_snake_eat_sound();
             #endif
         #endif
         if (snake_died) {

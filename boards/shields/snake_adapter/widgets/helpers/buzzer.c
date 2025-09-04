@@ -26,20 +26,11 @@ LOG_MODULE_REGISTER(app_buzzer, LOG_LEVEL_DBG);
 #define ONEUP_NOTES 6
 #define COIN_NOTES 2
 #define BEEP_NOTES 1
-#define COIN_CHORDS_COUNT 2
 #define CRAZY_COIN_NOTES 48
 
 static const struct pwm_dt_spec sBuzzer = PWM_DT_SPEC_GET(DT_CHOSEN(zephyr_buzzer));
 
-SongName song = funkytown;
-
-static const int coin_chord1[] = { B5 };
-static const int coin_chord2[] = { E6 };
-
-static Chord coin_chords[COIN_CHORDS_COUNT] = {
-	{.note_count = 2, .duration = EIGTH, .notes = coin_chord1},
-	{.note_count = 2, .duration = HALF, .notes = coin_chord2},
-};
+SongName song = snake_game_intro;
 
 static Sound coin_song[COIN_NOTES] = {
     {.note = B6, .duration = EIGTH},
@@ -218,7 +209,6 @@ extern void buzzer_thread(void *d0, void *d1, void *d2)
 			case coin: play_song(coin_song, COIN_NOTES); break;
 			case reversed_coin: play_song(reversed_coin_song, COIN_NOTES); break;
 			case crazy_coin: play_song(crazy_coin_song, CRAZY_COIN_NOTES); break;
-			case coin_polyphonic: play_chords(coin_chords, COIN_CHORDS_COUNT); break;
             case theme_change_song: run_theme_change_song(); break;
             case connected_song: run_connected_song(); break;
             case disconnected_song: run_disconnected_song(); break;
@@ -226,6 +216,8 @@ extern void buzzer_thread(void *d0, void *d1, void *d2)
             case notification_song: run_notification_song(); break;
             case startup_song: run_startup_song(); break;
             case powerd_down_song: run_powerd_down_song(); break;
+            case snake_game_intro: run_snake_game_intro(); break;
+            case snake_eat_sound: run_snake_eat_sound(); break;
 			default: break;
 			}
 		}
@@ -284,6 +276,57 @@ void play_startup_song(void) {
 void play_powerd_down_song(void) {
     song = powerd_down_song;
     k_wakeup(buzzer_tid);
+}
+
+void play_snake_game_intro(void) {
+    song = snake_game_intro;
+    k_wakeup(buzzer_tid);
+}
+
+void play_snake_eat_sound(void) {
+    song = snake_eat_sound;
+    k_wakeup(buzzer_tid);
+}
+
+// #####################################################################################
+
+// void run_snake_game_intro() {
+//     play_slide_with_vibrato(C4, G5, 800, 20.0f, 5.0f);  // rising retro sweep
+//     play_trill(G5, B5, 300, 12);                        // playful trill
+//     play_sound((Sound){ .note = E6, .duration = 150 }); // landing tone
+//     play_bitcrushed_ramp(C6, G6, 300);                  // jagged retro rise
+// 	stop_pwm();
+// }
+
+void run_snake_game_intro() {
+    // 1. Glissando sweep up (smooth pitch ramp)
+    play_glissando(C4, C6, 400);
+
+    // 2. Trill between C6 and D6 – musical expression
+    play_trill(C6, D6, 250, 12);
+
+    // 3. Bitcrushed retro chirp from A4 to E5
+    play_bitcrushed_ramp(A4, E5, 300);
+
+    // 4. Slide down quickly – like falling
+    play_slide(E5, C4, 300);
+
+    // 5. Dual note "chime" at the end
+    play_dual_note_simulated(C5, G5, 300);
+
+    // 6. Fast stutter on final C5 to emphasize "ready"
+    play_tremolo(C5, 250, 16.0f);
+
+    stop_pwm();
+}
+
+// #####################################################################################
+
+void run_snake_eat_sound() {
+    // Start with a trill and finish with a quick upward slide
+    play_trill(E6, G6, 80, 20);                 // short, playful trill
+    play_slide(G6, A6, 50);                     // a quick upward slide
+	stop_pwm();
 }
 
 
@@ -559,5 +602,12 @@ void play_powerd_down_song(void) {
     return;
 }
 
+void play_snake_game_intro(void) {
+    return;
+}
+
+void run_snake_eat_sound() {
+    return;
+}
 
 #endif

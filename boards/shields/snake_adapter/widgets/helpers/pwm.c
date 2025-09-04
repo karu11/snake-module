@@ -162,7 +162,6 @@ Technique Combinations
 
 void play_sound(Sound sound) {
     if (sound.note < 10) {
-        /* Low frequency notes represent a 'pause' */
         stop_pwm();
         k_msleep(sound.duration);
     } else {
@@ -192,8 +191,6 @@ void play_slide(int start_freq, int end_freq, int duration_ms) {
         k_msleep(step_ms);
         elapsed_ms += step_ms;
     }
-
-    // Stop the sound after done
     stop_pwm();
 }
 
@@ -227,8 +224,6 @@ void play_slide_with_vibrato(int start_freq, int end_freq, int duration_ms, floa
         k_msleep(step_ms);
         elapsed_ms += step_ms;
     }
-
-    // Stop sound
     stop_pwm();
 }
 
@@ -254,8 +249,6 @@ void play_slide_exponential(float start_freq, float end_freq, uint32_t duration_
         k_msleep(step_ms);
         elapsed_ms += step_ms;
     }
-
-    // Stop the sound after done
     stop_pwm();
 }
 
@@ -279,8 +272,6 @@ void play_sound_with_vibrato(Sound sound, float vibrato_depth_hz, float vibrato_
         k_msleep(step_ms);
         elapsed_ms += step_ms;
     }
-
-    // Stop the sound after done
 	stop_pwm();
 }
 
@@ -304,13 +295,4 @@ void play_dual_note_simulated(int freq1, int freq2, uint32_t duration_ms) {
 
     // Stop sound
     stop_pwm();
-}
-
-void play_chords(Chord chords[], int chords_count) {
-    for (int i = 0; i < chords_count; i++) {
-        Chord chord = chords[i];
-        play_dual_note_simulated(chord.notes[0], chord.notes[1], chord.duration);
-    }
-
-	stop_pwm();
 }

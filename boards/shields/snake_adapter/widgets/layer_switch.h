@@ -11,3 +11,5 @@
 
 void zmk_widget_layer_switch_init(void);
 void start_layer_switch(bool is_menu_on);
+void set_theme_threshold(uint16_t term_ms);
+void set_mute_threshold(uint16_t term_ms);

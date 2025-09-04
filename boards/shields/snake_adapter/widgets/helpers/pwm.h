@@ -3,16 +3,17 @@ typedef struct {
 	int duration; /* msec */
 } Sound;
 
-typedef struct {
-	int note_count;
-	int duration;
-	const int *notes;
-} Chord;
-
 void stop_pwm(void);
 void play_song(Sound sounds[], int notes_count);
 void play_sound_with_vibrato(Sound sound, float vibrato_depth_hz, float vibrato_rate_hz);
-void play_chords(Chord chords[], int chords_count);
+void play_tremolo(int freq, int duration_ms, float rate_hz);
+void play_trill(int note1, int note2, int duration_ms, int rate_hz);
+void play_glissando(int start_note, int end_note, int duration_ms);
+void play_bitcrushed_ramp(int start_note, int end_note, int duration_ms);
+void play_slide_exponential(float start_freq, float end_freq, uint32_t duration_ms);
+void play_slide(int start_freq, int end_freq, int duration_ms);
+void play_slide_with_vibrato(int start_freq, int end_freq, int duration_ms, float vibrato_depth_hz, float vibrato_rate_hz);
+void play_dual_note_simulated(int freq1, int freq2, uint32_t duration_ms);
 
 #define PI 3.14159265
 

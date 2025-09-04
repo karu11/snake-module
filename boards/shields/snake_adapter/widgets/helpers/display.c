@@ -66,7 +66,7 @@ static DefaultScreen default_screen = SNAKE_SCREEN;
 
 #define COLORS_PER_THEME 6
 
-static uint8_t themes_colors_len = 10;
+static uint8_t themes_colors_len = 11;
 static uint32_t themes_colors[][COLORS_PER_THEME] = {
     // primary  secondary  back1      back2
     {0x3dff98u, 0xff4adcu, 0x222323u, 0x121313u, 0, 0}, // C  - custom https://lospec.com/palette-list/b4sement
@@ -75,10 +75,11 @@ static uint32_t themes_colors[][COLORS_PER_THEME] = {
     {0x94e344u, 0x46878fu, 0x332c50u, 0x231c40u, 0, 0}, // 03 - https://lospec.com/palette-list/kirokaze-gameboy
     {0x5fc75du, 0x36868fu, 0x203671u, 0x0f052du, 0, 0}, // 04 - https://lospec.com/palette-list/moonlight-gb
     {0xff4d6du, 0xfcdeeau, 0x265935u, 0x012824u, 0, 0}, // 05 - https://lospec.com/palette-list/cherrymelon
-    {0xc56981u, 0x545c7eu, 0xa3a29au, 0x282328u, 0, 0}, // 06 - https://lospec.com/palette-list/bittersweet
-    {0x71969fu, 0xfce4a8u, 0xd71a21u, 0x01334eu, 0, 0}, // 07 - https://lospec.com/palette-list/americana
-    {0xff8e80u, 0xc53a9du, 0x4a2480u, 0x051f39u, 0, 0}, // 08 - https://lospec.com/palette-list/lava-gb
-    {0xecfffbu, 0x576373u, 0x323859u, 0x0c0421u, 0, 0}, // 09 - https://lospec.com/gallery/dogmaster/cave
+    {0xc56981u, 0xa3a29au, 0x545c7eu, 0x282328u, 0, 0}, // 06 - https://lospec.com/palette-list/bittersweet
+    {0xff8e80u, 0xc53a9du, 0x4a2480u, 0x051f39u, 0, 0}, // 07 - https://lospec.com/palette-list/lava-gb
+    {0xecfffbu, 0x858f97u, 0x576373u, 0x323859u, 0, 0}, // 08 - https://lospec.com/gallery/dogmaster/cave
+    {0xa3da58u, 0xf7ba2bu, 0x615aa8u, 0x592661u, 0, 0}, // 09 - Eva 01 neon genesis evangelion
+    {0xff3b94u, 0xa6fd29u, 0x55ffe1u, 0xaf3dffu, 0, 0}, // 10 - neon colors
 };
 
 void set_complete_colors_theme() {
@@ -1811,7 +1812,7 @@ void set_colorscheme(uint32_t primary, uint32_t secondary, uint32_t background1,
     set_logo_bg_color(background2);
 
     set_frame_color(background1);
-    set_frame_color_1(darken_color(background1, 0.1));
+    set_frame_color_1(darken_color(background1, 0.2));
     set_menu_bg_color(background2);
 }
 
