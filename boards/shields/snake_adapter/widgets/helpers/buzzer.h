@@ -23,6 +23,7 @@ typedef enum {
 	powerd_down_song,
 	snake_game_intro,
 	snake_eat_sound,
+	no_song,
 } SongName;
 
 int app_buzzer_init(void);

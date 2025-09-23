@@ -60,6 +60,9 @@ lv_obj_t* zmk_display_status_screen() {
 
     #ifdef CONFIG_USE_BUZZER
     app_buzzer_init();
+        #ifdef CONFIG_USE_SPLASH_SOUND
+            play_snake_game_intro();
+        #endif
     #endif
     
     zmk_widget_peripheral_status_init();
@@ -67,6 +70,7 @@ lv_obj_t* zmk_display_status_screen() {
     zmk_widget_snake_init();
     zmk_widget_output_status_init();
     zmk_widget_peripheral_battery_status_init();
+    zmk_widget_layer_init();
     zmk_widget_action_button_init();
 
 

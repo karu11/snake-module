@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#ifdef CONFIG_USE_BUZZER
-
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(app_buzzer, LOG_LEVEL_DBG);
 
@@ -28,9 +26,12 @@ LOG_MODULE_REGISTER(app_buzzer, LOG_LEVEL_DBG);
 #define BEEP_NOTES 1
 #define CRAZY_COIN_NOTES 48
 
+
+#ifdef CONFIG_USE_BUZZER
+
 static const struct pwm_dt_spec sBuzzer = PWM_DT_SPEC_GET(DT_CHOSEN(zephyr_buzzer));
 
-SongName song = snake_game_intro;
+SongName song = no_song;
 
 static Sound coin_song[COIN_NOTES] = {
     {.note = B6, .duration = EIGTH},

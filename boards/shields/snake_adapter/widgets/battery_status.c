@@ -37,9 +37,16 @@ static uint8_t previous_battery_level_0 = 0;
 static uint8_t previous_battery_level_1 = 0;
 
 static const uint16_t font_offset = 2;
+
+#ifdef CONFIG_USE_BATTERY_FONT_3X5
+static const uint16_t scale = 10;
+static const uint16_t font_width = 3;
+static const uint16_t font_height = 5;
+#else
 static const uint16_t scale = 6;
 static const uint16_t font_width = 5;
 static const uint16_t font_height = 8;
+#endif
 
 static const uint16_t start_x_peripheral_1 = 12;
 static const uint16_t start_x_peripheral_2 = 132;
@@ -61,25 +68,44 @@ void print_percentage(uint8_t digit, uint16_t x, uint16_t y, uint16_t scale, uin
     uint16_t second_x = x_position_scaled(x, 1);
     uint16_t third_x = x_position_scaled(x, 2);
     if (digit == 0) {
+        #ifdef CONFIG_USE_BATTERY_FONT_3X5
+        print_bitmap(scaled_bitmap_1, CHAR_DASH, first_x, y, scale, num_color, bg_color, FONT_SIZE_3x5);
+        print_bitmap(scaled_bitmap_1, CHAR_DASH, second_x, y, scale, num_color, bg_color, FONT_SIZE_3x5);
+        print_bitmap(scaled_bitmap_1, CHAR_PERCENTAGE, third_x, y, scale, percentage_color, bg_color, FONT_SIZE_3x5);
+        #else
         print_bitmap(scaled_bitmap_1, CHAR_DASH, first_x, y, scale, num_color, bg_color, FONT_SIZE_5x8);
         print_bitmap(scaled_bitmap_1, CHAR_DASH, second_x, y, scale, num_color, bg_color, FONT_SIZE_5x8);
         print_bitmap(scaled_bitmap_1, CHAR_PERCENTAGE, third_x, y, scale, percentage_color, bg_color, FONT_SIZE_5x8);
+        #endif
         return;
     }
 
     if (digit > 99) {
+        
+        #ifdef CONFIG_USE_BATTERY_FONT_3X5
+        print_bitmap(scaled_bitmap_1, 1, first_x,  y, scale, num_color, bg_color, FONT_SIZE_3x5);
+        print_bitmap(scaled_bitmap_1, 0, second_x, y, scale, num_color, bg_color, FONT_SIZE_3x5);
+        print_bitmap(scaled_bitmap_1, 0, third_x + 2, y, scale, num_color, bg_color, FONT_SIZE_3x5);
+        #else
         print_bitmap(scaled_bitmap_1, 1, first_x,  y, scale, num_color, bg_color, FONT_SIZE_5x8);
         print_bitmap(scaled_bitmap_1, 0, second_x, y, scale, num_color, bg_color, FONT_SIZE_5x8);
         print_bitmap(scaled_bitmap_1, 0, third_x + 2, y, scale, num_color, bg_color, FONT_SIZE_5x8);
+        #endif
         return;
     }
 
     uint16_t first_num = digit / 10;
     uint16_t second_num = digit % 10;
 
+    #ifdef CONFIG_USE_BATTERY_FONT_3X5
+    print_bitmap(scaled_bitmap_1, first_num, first_x, y, scale, num_color, bg_color, FONT_SIZE_3x5);
+    print_bitmap(scaled_bitmap_1, second_num, second_x, y, scale, num_color, bg_color, FONT_SIZE_3x5);
+    print_bitmap(scaled_bitmap_1, CHAR_PERCENTAGE, third_x + 2, y, scale, percentage_color, bg_color, FONT_SIZE_3x5);
+    #else
     print_bitmap(scaled_bitmap_1, first_num, first_x, y, scale, num_color, bg_color, FONT_SIZE_5x8);
     print_bitmap(scaled_bitmap_1, second_num, second_x, y, scale, num_color, bg_color, FONT_SIZE_5x8);
     print_bitmap(scaled_bitmap_1, CHAR_PERCENTAGE, third_x + 2, y, scale, percentage_color, bg_color, FONT_SIZE_5x8);
+    #endif
 }
 
 void set_battery_symbol() {

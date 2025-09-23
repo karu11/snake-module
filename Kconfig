@@ -2,6 +2,10 @@ config DEFAULT_SCREEN
     string "Default screen"
     default "snake"
 
+config USE_BATTERY_FONT_3X5
+    bool "Use battery font 3x5"
+    default n
+
 config DISPLAY_BRIGHTNESS
     int "Display brightness"
     default 100
@@ -14,29 +18,21 @@ config THEME_THRESHOLD
     int "Theme threshold"
     default 300
 
-config THEME_COLOR_1
-    string "Color 1"
-    default "4aedff"
+config THEME_PRIMARY_COLOR
+    string "Theme primary color"
+    default "3dff98"
 
-config THEME_COLOR_2
-    string "Color 2"
-    default "ff8acd"
+config THEME_SECONDARY_COLOR
+    string "Theme secondary color"
+    default "ff4adc"
 
-config THEME_COLOR_3
-    string "Color 3"
-    default "b03e80"
+config THEME_BG_COLOR
+    string "Theme background color"
+    default "222323"
     
-config THEME_COLOR_4
-    string "Color 4"
-    default "ffffff"
-    
-config THEME_COLOR_5
-    string "Color 5"
-    default "000000"
-
-config THEME_COLOR_6
-    string "Color 6"
-    default "dddddd"
+config THEME_BG_DARKER_COLOR
+    string "Theme background darker color"
+    default "121313"
 
 config SNAKE_FATNESS
     int "Snake fatness"
@@ -44,6 +40,10 @@ config SNAKE_FATNESS
 
 config SPLASH_USE_SNAKE_2
     bool "Use Snake 2 Splash screen"
+    default n
+
+config USE_SPLASH_SOUND
+    bool "Use splash sound"
     default n
 
 config USE_FOOD_SOUND
@@ -68,6 +68,10 @@ config USE_MENU_SOUND
 
 config USE_BUZZER
     bool "Use buzzer"
+    default n
+
+config SHOW_ACTIVE_LAYER
+    bool "Show active layer"
     default y
 
 config SNAKE_BOARD_SIZE
@@ -222,15 +226,23 @@ config BT_BG_COLOR
     string ""
     default "000000"
 
+config LAYER_FONT_COLOR
+    string ""
+    default "000000"
+
+config LAYER_FONT_BG_COLOR
+    string ""
+    default "000000"
+
+config THEME_FONT_BG_COLOR
+    string ""
+    default "000000"
+
 config THEME_FONT_COLOR
     string ""
     default "000000"
 
 config THEME_FONT_COLOR_1
-    string ""
-    default "000000"
-
-config THEME_BG_COLOR
     string ""
     default "000000"
 
