@@ -23,7 +23,7 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <zmk/keymap.h>
 #include <zmk/display.h>
 
-#include "layer_switch.h"
+#include "action_button.h"
 #include "snake.h"
 #include "output_status.h"
 #include "battery_status.h"
@@ -42,7 +42,7 @@ static uint16_t mute_threshold = 600;
 static int64_t pressed_timestamp = 0;
 static int64_t released_timestamp = 0;
 
-static bool layer_switch_initialized = false;
+static bool action_button_initialized = false;
 static struct layer_status_state ls_state;
 
 static bool menu_on = false;
@@ -156,40 +156,6 @@ void set_layer_symbol() {
     dongle_lock = false;
 }
 
-// uint16_t compare_integers(const void *a, const void *b) {
-//     return (*(uint16_t *)a - *(uint16_t *)b);
-// }
-
-// uint16_t find_closest_below_elapsed(const uint16_t *array, size_t size, int64_t elapsed_time) {
-//     qsort(array, size, sizeof(uint16_t), compare_integers);
-
-//     for (uint8_t i = 0; i < size; i++) {
-//         if (elapsed_time < array[i]) {
-//             if (i == 0) {
-//                 return array[0];
-//             }
-//             return array[i - 1];
-//         }
-//     }
-//     return array[size-1];
-// }
-
-
-// uint8_t get_action(int64_t elapsed_time) {
-//     uint16_t thresholds[] = {menu_threshold, theme_threshold, mute_threshold};
-//     uint16_t threshold = find_closest_below_elapsed(thresholds, 3, elapsed_time);
-//     if (threshold == menu_threshold) {
-//         return menu_layer;
-//     }
-//     if (threshold == theme_threshold) {
-//         return theme_layer;
-//     }
-//     if (threshold == mute_threshold) {
-//         return mute_layer;
-//     }
-//     return menu_layer;
-// }
-
 void dongle_action_update_cb(struct zmk_dongle_actioned state) {
     if (state.timestamp == 0) {
         return;
@@ -213,7 +179,7 @@ void dongle_action_update_cb(struct zmk_dongle_actioned state) {
         ls_state = (struct layer_status_state) {
             .index = index
         };
-        if (layer_switch_initialized) {
+        if (action_button_initialized) {
             set_layer_symbol();
         }
         pressed_timestamp = 0;
@@ -234,13 +200,13 @@ ZMK_DISPLAY_WIDGET_LISTENER(dongle_action, struct zmk_dongle_actioned, dongle_ac
 ZMK_SUBSCRIPTION(dongle_action, zmk_dongle_actioned);
 
 
-void zmk_widget_layer_switch_init() {
+void zmk_widget_action_button_init() {
     dongle_action_init();
 
     buf_frame = (uint8_t*)k_malloc(320 * 2 * sizeof(uint8_t));
 }
 
-void start_layer_switch(bool is_menu_on) {
+void start_action_button(bool is_menu_on) {
     menu_on = is_menu_on;
-    layer_switch_initialized = true;
+    action_button_initialized = true;
 }

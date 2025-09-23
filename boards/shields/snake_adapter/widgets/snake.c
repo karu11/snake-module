@@ -550,8 +550,8 @@ static void walk_render(void) {
         prepend_snake_part(draw_step.coordinate.x, draw_step.coordinate.y);
         snake_render_pixel(draw_step.coordinate.x, draw_step.coordinate.y, true);
 
+        draw_food();
         if (current_speed == SPEED_SUPER_FAST) {
-            draw_food();
             paint_snake();
         }
     } else {

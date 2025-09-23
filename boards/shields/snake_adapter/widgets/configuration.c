@@ -3,7 +3,7 @@ LOG_MODULE_REGISTER(app_configuration, LOG_LEVEL_DBG);
 
 #include <stdlib.h>
 #include "helpers/display.h"
-#include "layer_switch.h"
+#include "action_button.h"
 
 #include <zephyr/device.h>
 #include <zephyr/drivers/pwm.h>

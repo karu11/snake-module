@@ -10,7 +10,7 @@
 #include "widgets/splash.h"
 #include "widgets/snake.h"
 #include "widgets/helpers/display.h"
-#include "widgets/layer_switch.h"
+#include "widgets/action_button.h"
 #include "widgets/logo.h"
 #include "widgets/configuration.h"
 
@@ -42,7 +42,7 @@ void timer_splash(lv_timer_t * timer) {
             start_snake();
             menu_on = false;
         }
-        start_layer_switch(menu_on);
+        start_action_button(menu_on);
 
         lv_timer_pause(timer);
         splash_finished = true;
@@ -67,7 +67,7 @@ lv_obj_t* zmk_display_status_screen() {
     zmk_widget_snake_init();
     zmk_widget_output_status_init();
     zmk_widget_peripheral_battery_status_init();
-    zmk_widget_layer_switch_init();
+    zmk_widget_action_button_init();
 
 
     lv_timer_create(timer_splash, SPLASH_DURATION, NULL);
