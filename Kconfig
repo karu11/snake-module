@@ -2,6 +2,10 @@ config DEFAULT_SCREEN
     string "Default screen"
     default "snake"
 
+config SHOW_SINGLE_BATTERY
+    bool "Show single battery"
+    default n
+
 config USE_BATTERY_FONT_3X5
     bool "Use battery font 3x5"
     default n

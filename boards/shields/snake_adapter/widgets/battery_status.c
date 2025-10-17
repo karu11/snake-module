@@ -36,7 +36,12 @@ static uint16_t *scaled_bitmap_1;
 static uint8_t previous_battery_level_0 = 0;
 static uint8_t previous_battery_level_1 = 0;
 
+#ifdef CONFIG_SHOW_SINGLE_BATTERY
+static const uint16_t font_offset = 6;
+static const uint16_t single_battery_offset = 60;
+#else
 static const uint16_t font_offset = 2;
+#endif
 
 #ifdef CONFIG_USE_BATTERY_FONT_3X5
 static const uint16_t scale = 10;
@@ -109,8 +114,12 @@ void print_percentage(uint8_t digit, uint16_t x, uint16_t y, uint16_t scale, uin
 }
 
 void set_battery_symbol() {
+    #ifdef CONFIG_SHOW_SINGLE_BATTERY
+    print_percentage(battery_state_0.level, start_x_peripheral_1 + single_battery_offset, start_y, scale, get_battery_num_color(), get_battery_bg_color(), get_battery_percentage_color());
+    #else
     print_percentage(battery_state_0.level, start_x_peripheral_1, start_y, scale, get_battery_num_color(), get_battery_bg_color(), get_battery_percentage_color());
     print_percentage(battery_state_1.level, start_x_peripheral_2, start_y, scale, get_battery_num_color_1(), get_battery_bg_color_1(), get_battery_percentage_color_1());
+    #endif
 }
 
 #ifdef CONFIG_USE_BUZZER
@@ -167,8 +176,12 @@ ZMK_DISPLAY_WIDGET_LISTENER(widget_battery_status, struct peripheral_battery_sta
 ZMK_SUBSCRIPTION(widget_battery_status, zmk_peripheral_battery_state_changed);
 
 void print_empty_batteries() {
+    #ifdef CONFIG_SHOW_SINGLE_BATTERY
+    print_percentage(0, start_x_peripheral_1 + single_battery_offset, start_y, scale, get_battery_num_color(), get_battery_bg_color(), get_battery_percentage_color());
+    #else
     print_percentage(0, start_x_peripheral_1, start_y, scale, get_battery_num_color(), get_battery_bg_color(), get_battery_percentage_color());
     print_percentage(0, start_x_peripheral_2, start_y, scale, get_battery_num_color_1(), get_battery_bg_color_1(), get_battery_percentage_color_1());
+    #endif
 }
 
 void zmk_widget_peripheral_battery_status_init() {

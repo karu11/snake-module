@@ -85,8 +85,12 @@ void print_frames() {
     print_container(buf_frame, 120, 240, 112, 161, thickness);
 
     // battery frames 
+    #ifdef CONFIG_SHOW_SINGLE_BATTERY
+    print_container(buf_frame, 0, 240, 160, 240, thickness);
+    #else
     print_container(buf_frame, 0, 120, 160, 240, thickness);
     print_container(buf_frame, 120, 240, 160, 240, thickness);
+    #endif
 }
 
 void print_menu() {
