@@ -5,7 +5,7 @@
     chosen {
         zephyr,display = &st7789v;
 		zephyr,buzzer = &buzzer;
-		zephyr,backlight = &pwmbuzzer_backlight;
+		zephyr,backlight = &backlight;
     };
 
     behaviors {
